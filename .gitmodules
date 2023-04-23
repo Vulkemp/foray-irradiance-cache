@@ -1,0 +1,3 @@
+[submodule "foray"]
+	path = foray
+	url = git@github.com:Vulkemp/foray.git

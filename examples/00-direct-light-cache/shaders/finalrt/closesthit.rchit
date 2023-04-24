@@ -26,7 +26,7 @@
 #define HITPAYLOAD_OUT
 #include "rt_common/payload.glsl"
 #define VISIPAYLOAD_OUT
-#include "../visibilitytest/payload.glsl"
+#include "visibilitytest/payload.glsl"
 
 hitAttributeEXT vec2 attribs; // Barycentric coordinates
 
@@ -118,84 +118,6 @@ vec3 CollectDirectLight(in vec3 pos, in vec3 normal, in MaterialBufferObject mat
     }
 }
 
-vec3 CollectIndirectLight(in vec3 pos, in vec3 normal, in MaterialBufferObject material, in MaterialProbe probe)
-{
-    vec3 sumIndirect = vec3(0);
-    int weightIndirect = 0;
-
-    // Calculate count of secondary rays to emit. Use current rays Attenuation for bailout
-    const float attenuationModifier = min(dot(ReturnPayload.Attenuation, ReturnPayload.Attenuation), 1);
-    const float rng = lcgFloat(ReturnPayload.Seed);
-    const float modifier = 1.0;
-    uint secondary = uint(max(0, attenuationModifier + attenuationModifier * rng * modifier));
-
-    bool perfectlyReflective = probe.MetallicRoughness.r > 0.99 && probe.MetallicRoughness.g < 0.01;
-    if (perfectlyReflective)
-    {
-        // Use at most 1 ray for perfectly reflective surfaces
-        secondary = min(secondary, 1);
-    }
-
-    uint seed = ReturnPayload.Seed;
-    for (uint i = 0; i < secondary; i++)
-    {
-        seed += 1;
-        float alpha = probe.MetallicRoughness.g * probe.MetallicRoughness.g;
-        vec3 origin = pos;
-
-        HitSample hit;
-        hit.wOut = normalize(-gl_WorldRayDirectionEXT);
-        if (perfectlyReflective)
-        {
-            hit.Normal = normal;
-        }
-        else
-        {
-            hit.Normal = importanceSample_GGX(seed, probe.MetallicRoughness.g, normal);
-        }
-        hit.wIn = normalize(-reflect(hit.wOut, hit.Normal));
-        hit.wHalf = normalize(hit.wOut + hit.wIn);
-
-        float ndotl = dot(hit.wIn, hit.Normal);
-        float ndotv = dot(hit.wOut, hit.Normal);
-        CorrectOrigin(origin, normal, ndotl);
-
-        ConstructHitPayload();
-        ChildPayload.Seed = ReturnPayload.Seed + i;
-        ChildPayload.Attenuation = EvaluateMaterial(hit, material, probe);
-        ChildPayload.Depth = ReturnPayload.Depth + 1;
-
-        if (dot(ChildPayload.Attenuation, ChildPayload.Attenuation) > 0.001) // If expected contribution is high enough ...
-        {
-            // Trace a primary ray in the chosen direction
-
-            traceRayEXT(MainTlas, // Top Level Acceleration Structure
-                0, // RayFlags (Possible use: skip AnyHit, ClosestHit shaders etc.)
-                0xff, // Culling Mask (Possible use: Skip intersection which don't have a specific bit set)
-                0, // SBT record offset
-                0, // SBT record stride
-                0, // Miss Index
-                origin, // Ray origin in world space
-                0.001, // Minimum ray travel distance
-                hit.wIn, // Ray direction in world space
-                INFINITY, // Maximum ray travel distance
-                0 // Payload index (outgoing payload bound to location 0 in payload.glsl)
-            );
-
-            sumIndirect += ChildPayload.Radiance;
-            weightIndirect += 1;
-        }
-    }
-    if (weightIndirect > 0)
-    {
-        return sumIndirect / weightIndirect;
-    }
-    else
-    {
-        return vec3(0);
-    }
-}
-
 void main()
 {
     // The closesthit shader is invoked with hit information on the geometry intersect closest to the ray origin
@@ -240,13 +162,7 @@ void main()
     normalWorldSpace = ApplyNormalMap(TBN, probe);
 
     vec3 directLight = CollectDirectLight(posWorldSpace, normalWorldSpace, material, probe);
-    vec3 indirectLight = vec3(0);
-
-    if (ReturnPayload.Depth < 5)
-    {
-        indirectLight = CollectIndirectLight(posWorldSpace, normalWorldSpace, material, probe);
-    }
     float rayDist = length(posWorldSpace - gl_WorldRayOriginEXT);
-    ReturnPayload.Radiance = directLight + indirectLight + probe.EmissiveColor;
+    ReturnPayload.Radiance = directLight + probe.EmissiveColor;
     ReturnPayload.Distance = length(posWorldSpace - gl_WorldRayOriginEXT);
 }

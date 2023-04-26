@@ -5,13 +5,14 @@
 
 namespace irradiance_cache {
 
-    inline const std::string SHADER_FOLDER = "shaders/finalrt/";
-    inline const std::string RAYGEN_FILE = SHADER_FOLDER + "raygen.rgen";
-    inline const std::string CLOSESTHIT_FILE = SHADER_FOLDER + "closesthit.rchit";
-    inline const std::string ANYHIT_FILE = SHADER_FOLDER + "anyhit.rahit";
-    inline const std::string MISS_FILE = SHADER_FOLDER + "miss.rmiss";
-    inline const std::string VISI_MISS_FILE = SHADER_FOLDER + "visibilitytest/miss.rmiss";
-    inline const std::string VISI_ANYHIT_FILE = SHADER_FOLDER + "visibilitytest/anyhit.rahit";
+    inline const std::string FOLDER_FINALRT = "shaders/finalrt/";
+    inline const std::string FOLDER_VISITEST = "shaders/visitest/";
+    inline const std::string RAYGEN_FILE = FOLDER_FINALRT + "raygen.rgen";
+    inline const std::string CLOSESTHIT_FILE = FOLDER_FINALRT + "closesthit.rchit";
+    inline const std::string ANYHIT_FILE = FOLDER_FINALRT + "anyhit.rahit";
+    inline const std::string MISS_FILE = FOLDER_FINALRT + "miss.rmiss";
+    inline const std::string VISI_MISS_FILE = FOLDER_VISITEST + "miss.rmiss";
+    inline const std::string VISI_ANYHIT_FILE = FOLDER_VISITEST + "anyhit.rahit";
 
     const uint32_t BINDPOINT_LIGHTS = 11;
 

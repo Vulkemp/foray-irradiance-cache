@@ -25,8 +25,9 @@
 #define HITPAYLOAD_IN
 #define HITPAYLOAD_OUT
 #include "rt_common/payload.glsl"
-#define VISIPAYLOAD_OUT
-#include "visibilitytest/payload.glsl"
+
+#include "../visitest/visitest.glsl"
+const VisiTestConfig visiTestConfig = {1, 0, 1};
 
 hitAttributeEXT vec2 attribs; // Barycentric coordinates
 
@@ -71,23 +72,7 @@ vec3 CollectDirectLight(in vec3 pos, in vec3 normal, in MaterialBufferObject mat
 
         if (nDotL > 0) // If light source is not behind the surface ...
         {
-            // Perform visibility test
-            VisiPayload.Hit = true;
-
-            traceRayEXT(MainTlas, // Top Level Acceleration Structure
-                gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsSkipClosestHitShaderEXT, // All we care about is the miss shader to tell us the lightsource is visible
-                0xff, // Culling Mask (Possible use: Skip intersection which don't have a specific bit set)
-                1,
-                0,
-                1, // Miss Index (the visibility test miss shader)
-                origin, // Ray origin in world space
-                0.001, // Minimum ray travel distance
-                dir, // Ray direction in world space
-                len, // Maximum ray travel distance
-                2 // Payload index (outgoing payload bound to location 0 in payload.glsl)
-            );
-
-            if (!VisiPayload.Hit) // If light source is visible ...
+            if (!performVisiTest(visiTestConfig, origin, 0.001, dir, len)) // If light source is visible ...
             {
                 HitSample hit;
                 hit.Normal = normal;

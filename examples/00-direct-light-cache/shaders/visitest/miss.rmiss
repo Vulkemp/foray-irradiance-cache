@@ -7,5 +7,6 @@
 
 void main()
 {
-    ReturnPayload.Hit = false; // If the miss shader is invoked, no geometry has been hit, so the visibility test does not report a hit
+    // If the miss shader is invoked, no geometry has been hit, so the visibility test does not report a hit
+    ReturnPayload.hit = false;
 }

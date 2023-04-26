@@ -3,7 +3,7 @@
 
 struct VisibilityPayload
 {
-    bool Hit;
+    bool hit;
 };
 
 #ifdef VISIPAYLOAD_OUT

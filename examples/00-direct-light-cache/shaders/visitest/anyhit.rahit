@@ -21,12 +21,11 @@ hitAttributeEXT vec2 attribs; // Barycentric coordinates
 
 void main()
 {
-	// Get geometry meta info
+	// get geometry meta and material
 	GeometryMeta geometa = GetGeometryMeta(uint(gl_InstanceCustomIndexEXT), uint(gl_GeometryIndexEXT));
-
-	// get material 
 	MaterialBufferObject material = GetMaterialOrFallback(geometa.MaterialIndex);
 
+	// test full transparency / opqaueness
 	if (material.TransmissionFactor > 0.f)
 	{
 		ignoreIntersectionEXT;
@@ -36,22 +35,15 @@ void main()
 		return;
 	}
 
-	// Calculate barycentric coords from hitAttribute values
+	// get geometry
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
-	
-	// get primitive indices
 	const uvec3 indices = GetIndices(geometa, uint(gl_PrimitiveID));
-
-	// get primitive vertices
 	Vertex v0, v1, v2;
 	GetVertices(indices, v0, v1, v2);
-
-	// calculate uv
     const vec2 uv = v0.Uv * barycentricCoords.x + v1.Uv * barycentricCoords.y + v2.Uv * barycentricCoords.z;
 
-	bool isOpaque = ProbeAlphaOpacity(material, uv);
-
-    if (!isOpaque)
+	// test alpha opacity via material and texture
+    if (!ProbeAlphaOpacity(material, uv))
     {
         ignoreIntersectionEXT;
     }

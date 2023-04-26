@@ -1,4 +1,3 @@
-#include <iostream>
 #include "FinalRTStage.h"
 #include "scene/foray_scene.hpp"
 

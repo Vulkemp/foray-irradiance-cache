@@ -11,14 +11,12 @@ irradiance_cache::FinalRTShaders::FinalRTShaders(irradiance_cache::FinalRTStage 
     s.mShaderKeys.push_back(mClosestHit.CompileFromSource(s.mContext, CLOSESTHIT_FILE, options));
     s.mShaderKeys.push_back(mAnyHit.CompileFromSource(s.mContext, ANYHIT_FILE, options));
     s.mShaderKeys.push_back(mMiss.CompileFromSource(s.mContext, MISS_FILE, options));
-    s.mShaderKeys.push_back(mVisiMiss.CompileFromSource(s.mContext, VISI_MISS_FILE, options));
-    s.mShaderKeys.push_back(mVisiAnyHit.CompileFromSource(s.mContext, VISI_ANYHIT_FILE, options));
 
     s.mPipeline.GetRaygenSbt().SetGroup(0, &mRaygen);
     s.mPipeline.GetHitSbt().SetGroup(0, &mClosestHit, &mAnyHit, nullptr);
-    s.mPipeline.GetHitSbt().SetGroup(1, nullptr, &mVisiAnyHit, nullptr);
     s.mPipeline.GetMissSbt().SetGroup(0, &mMiss);
-    s.mPipeline.GetMissSbt().SetGroup(1, &mVisiMiss);
+    visiTest.Init(s.mContext, s.mShaderKeys, s.mPipeline, 1);
+
     s.mPipeline.Build(s.mContext, s.mPipelineLayout);
 }
 

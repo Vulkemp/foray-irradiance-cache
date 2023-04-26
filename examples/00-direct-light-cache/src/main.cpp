@@ -2,9 +2,9 @@
 #include <vector>
 #include "IrradianceCacheApp.h"
 
-namespace irradiance_cache {
+namespace foray::irradiance_cache {
     int example(std::vector<std::string> &args) {
-        foray::osi::OverrideCurrentWorkingDirectory(CWD_OVERRIDE);
+        osi::OverrideCurrentWorkingDirectory(CWD_OVERRIDE);
         IrradianceCacheApp app;
         return app.Run();
     }
@@ -15,5 +15,5 @@ int main(int argv, char **args) {
     for (int i = 0; i < argv; i++) {
         argvec[i] = args[i];
     }
-    return irradiance_cache::example(argvec);
+    return foray::irradiance_cache::example(argvec);
 }

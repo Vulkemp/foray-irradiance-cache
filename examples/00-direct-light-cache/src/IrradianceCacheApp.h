@@ -3,10 +3,9 @@
 #include <foray_api.hpp>
 #include "FinalRTStage.h"
 
-namespace irradiance_cache {
+namespace foray::irradiance_cache {
 
     inline const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/scene.gltf";
-//    inline const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/exported.gltf";
     /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
     inline constexpr bool INVERT_BLIT_INSTEAD = true;
 

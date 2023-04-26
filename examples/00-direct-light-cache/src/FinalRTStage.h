@@ -4,9 +4,9 @@
 #include "scene/globalcomponents/foray_lightmanager.hpp"
 #include "VisiTest.h"
 
-namespace irradiance_cache {
+namespace foray::irradiance_cache {
 
-    inline const std::string FOLDER_FINALRT = "shaders/finalrt/";
+    inline const std::string FOLDER_FINALRT = "mShaders/finalrt/";
     inline const std::string RAYGEN_FILE = FOLDER_FINALRT + "raygen.rgen";
     inline const std::string CLOSESTHIT_FILE = FOLDER_FINALRT + "closesthit.rchit";
     inline const std::string ANYHIT_FILE = FOLDER_FINALRT + "anyhit.rahit";
@@ -22,19 +22,19 @@ namespace irradiance_cache {
         ~FinalRTShaders();
 
     private:
-        FinalRTStage *finalRtStage;
-        foray::core::ShaderModule mRaygen;
-        foray::core::ShaderModule mClosestHit;
-        foray::core::ShaderModule mAnyHit;
-        foray::core::ShaderModule mMiss;
-        VisiTest visiTest;
+        FinalRTStage *mFinalRtStage;
+        core::ShaderModule mRaygen;
+        core::ShaderModule mClosestHit;
+        core::ShaderModule mAnyHit;
+        core::ShaderModule mMiss;
+        VisiTest mVisiTest;
     };
 
-    class FinalRTStage : public foray::stages::DefaultRaytracingStageBase {
+    class FinalRTStage : public stages::DefaultRaytracingStageBase {
         friend FinalRTShaders;
 
     public:
-        virtual void Init(foray::core::Context *context, foray::scene::Scene *scene);
+        virtual void Init(core::Context *context, scene::Scene *scene);
 
     protected:
         void ApiCreateRtPipeline() override;
@@ -44,8 +44,8 @@ namespace irradiance_cache {
         void CreateOrUpdateDescriptors() override;
 
     private:
-        std::optional<FinalRTShaders> shaders;
-        foray::scene::gcomp::LightManager *mLightManager;
+        std::optional<FinalRTShaders> mShaders;
+        scene::gcomp::LightManager *mLightManager;
     };
 
 }

@@ -4,7 +4,7 @@
 
 namespace foray::irradiance_cache {
 
-    inline const std::string FOLDER_VISITEST = "mShaders/visitest/";
+    inline const std::string FOLDER_VISITEST = "shaders/visitest/";
     inline const std::string VISI_MISS_FILE = FOLDER_VISITEST + "miss.rmiss";
     inline const std::string VISI_ANYHIT_FILE = FOLDER_VISITEST + "anyhit.rahit";
 

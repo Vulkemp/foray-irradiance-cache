@@ -6,7 +6,7 @@
 
 namespace foray::irradiance_cache {
 
-    inline const std::string FOLDER_FINALRT = "mShaders/finalrt/";
+    inline const std::string FOLDER_FINALRT = "shaders/finalrt/";
     inline const std::string RAYGEN_FILE = FOLDER_FINALRT + "raygen.rgen";
     inline const std::string CLOSESTHIT_FILE = FOLDER_FINALRT + "closesthit.rchit";
     inline const std::string ANYHIT_FILE = FOLDER_FINALRT + "anyhit.rahit";

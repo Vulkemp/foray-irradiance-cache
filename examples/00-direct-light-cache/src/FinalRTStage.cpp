@@ -3,12 +3,15 @@
 
 namespace foray::irradiance_cache {
 
-    FinalRTShaders::FinalRTShaders(FinalRTStage *s2) {
-        FinalRTStage &s = *s2;
-        this->mFinalRtStage = &s;
+    const std::string FOLDER_IRRADIANCE_CACHE = "shaders/finalrt/";
+    const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE + "raygen.rgen";
+    const std::string CLOSESTHIT_FILE = FOLDER_IRRADIANCE_CACHE + "closesthit.rchit";
+    const std::string ANYHIT_FILE = FOLDER_IRRADIANCE_CACHE + "anyhit.rahit";
+    const std::string MISS_FILE = FOLDER_IRRADIANCE_CACHE + "miss.rmiss";
 
+    FinalRTShaders::FinalRTShaders(FinalRTStage &s) :
+            mStage(s) {
         foray::core::ShaderCompilerConfig options{.IncludeDirs = {FORAY_SHADER_DIR}};
-
         s.mShaderKeys.push_back(mRaygen.CompileFromSource(s.mContext, RAYGEN_FILE, options));
         s.mShaderKeys.push_back(mClosestHit.CompileFromSource(s.mContext, CLOSESTHIT_FILE, options));
         s.mShaderKeys.push_back(mAnyHit.CompileFromSource(s.mContext, ANYHIT_FILE, options));
@@ -23,11 +26,11 @@ namespace foray::irradiance_cache {
     }
 
     FinalRTShaders::~FinalRTShaders() {
-        this->mFinalRtStage->mPipeline.Destroy();
+        mStage.mPipeline.Destroy();
     }
 
     void FinalRTStage::ApiCreateRtPipeline() {
-        mShaders.emplace(this);
+        mShaders.emplace(*this);
     }
 
     void FinalRTStage::ApiDestroyRtPipeline() {

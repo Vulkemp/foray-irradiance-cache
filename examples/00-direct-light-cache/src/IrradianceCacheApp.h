@@ -2,6 +2,7 @@
 
 #include <foray_api.hpp>
 #include "FinalRTStage.h"
+#include "IrradianceCacheFillStage.hpp"
 
 namespace foray::irradiance_cache {
 
@@ -22,9 +23,13 @@ namespace foray::irradiance_cache {
         void ApiDestroy() override;
 
     private:
-        FinalRTStage mRtStage;
-        foray::stages::ImageToSwapchainStage mSwapCopyStage;
         std::unique_ptr<foray::scene::Scene> mScene;
+        std::optional<IrradianceCache> mIrradianceCache;
+
+        // stages
+        FinalRTStage mRtStage;
+        std::optional<IrradianceCacheFillStage> mIrradianceCacheFillStage;
+        foray::stages::ImageToSwapchainStage mSwapCopyStage;
     };
 
 }

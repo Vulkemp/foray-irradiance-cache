@@ -12,10 +12,22 @@ namespace foray::irradiance_cache {
         mScene->UseDefaultCamera(INVERT_BLIT_INSTEAD);
         mScene->UpdateLightManager();
 
+        // FIXME temp: guessed size of the scene
+        const glm::vec3 dimensionsEstimate(20, 4, 20);
+        glm::vec3 origin = -dimensionsEstimate;
+        glm::vec3 extent = dimensionsEstimate * glm::vec3(2);
+        const glm::vec3 probeDistance(0.2);
+        VkExtent3D imageExtent = IrradianceCache::calculateImageExtend(extent, probeDistance);
+        mIrradianceCache.emplace(&mContext, origin, extent, imageExtent);
+
+        mIrradianceCacheFillStage.emplace(*mIrradianceCache, mScene.get());
+        RegisterRenderStage(&*mIrradianceCacheFillStage);
+
         mRtStage.Init(&mContext, mScene.get());
+        RegisterRenderStage(&mRtStage);
+
         mSwapCopyStage.Init(&mContext, mRtStage.GetRtOutput());
         mSwapCopyStage.SetFlipY(INVERT_BLIT_INSTEAD);
-        RegisterRenderStage(&mRtStage);
         RegisterRenderStage(&mSwapCopyStage);
 
         DefaultAppBase::ApiInit();
@@ -36,6 +48,7 @@ namespace foray::irradiance_cache {
         cmdBuffer.Begin();
         renderInfo.GetInFlightFrame()->ClearSwapchainImage(cmdBuffer, renderInfo.GetImageLayoutCache());
         mScene->Update(renderInfo, cmdBuffer);
+        mIrradianceCacheFillStage->RecordFrame(cmdBuffer, renderInfo);
         mRtStage.RecordFrame(cmdBuffer, renderInfo);
         mSwapCopyStage.RecordFrame(cmdBuffer, renderInfo);
         renderInfo.GetInFlightFrame()->PrepareSwapchainImageForPresent(cmdBuffer, renderInfo.GetImageLayoutCache());
@@ -43,8 +56,11 @@ namespace foray::irradiance_cache {
     }
 
     void IrradianceCacheApp::ApiDestroy() {
-        mRtStage.Destroy();
         mSwapCopyStage.Destroy();
+        mRtStage.Destroy();
+        mIrradianceCacheFillStage.reset();
+
+        mIrradianceCache.reset();
         mScene = nullptr;
     }
 

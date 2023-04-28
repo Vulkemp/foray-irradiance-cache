@@ -4,9 +4,9 @@
 
 namespace foray::irradiance_cache {
 
-    inline const std::string FOLDER_VISITEST = "shaders/visitest/";
-    inline const std::string VISI_MISS_FILE = FOLDER_VISITEST + "miss.rmiss";
-    inline const std::string VISI_ANYHIT_FILE = FOLDER_VISITEST + "anyhit.rahit";
+    const std::string FOLDER_VISITEST = "shaders/visitest/";
+    const std::string VISI_MISS_FILE = FOLDER_VISITEST + "miss.rmiss";
+    const std::string VISI_ANYHIT_FILE = FOLDER_VISITEST + "anyhit.rahit";
 
     void VisiTest::VisiTest::Init(core::Context *context, std::vector<uint64_t> &shaderKeys, rtpipe::RtPipeline &pipeline, rtpipe::GroupIndex groupId) {
         core::ShaderCompilerConfig options{.IncludeDirs = {FORAY_SHADER_DIR}};

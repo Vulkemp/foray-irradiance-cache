@@ -6,23 +6,17 @@
 
 namespace foray::irradiance_cache {
 
-    inline const std::string FOLDER_FINALRT = "shaders/finalrt/";
-    inline const std::string RAYGEN_FILE = FOLDER_FINALRT + "raygen.rgen";
-    inline const std::string CLOSESTHIT_FILE = FOLDER_FINALRT + "closesthit.rchit";
-    inline const std::string ANYHIT_FILE = FOLDER_FINALRT + "anyhit.rahit";
-    inline const std::string MISS_FILE = FOLDER_FINALRT + "miss.rmiss";
-
     const uint32_t BINDPOINT_LIGHTS = 11;
 
     class FinalRTStage;
 
     class FinalRTShaders {
     public:
-        explicit FinalRTShaders(FinalRTStage *s);
+        explicit FinalRTShaders(FinalRTStage &s);
         ~FinalRTShaders();
 
     private:
-        FinalRTStage *mFinalRtStage;
+        FinalRTStage &mStage;
         core::ShaderModule mRaygen;
         core::ShaderModule mClosestHit;
         core::ShaderModule mAnyHit;

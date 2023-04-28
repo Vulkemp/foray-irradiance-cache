@@ -1,3 +1,6 @@
+#ifndef VISITEST_GLSL
+#define VISITEST_GLSL
+
 #define VISIPAYLOAD_OUT
 #include "payload.glsl"
 
@@ -25,3 +28,5 @@ bool performVisiTest(VisiTestConfig visiTest, vec3 origin, float Tmin, vec3 dir,
 	);
 	return VisiPayload.hit;
 }
+
+#endif

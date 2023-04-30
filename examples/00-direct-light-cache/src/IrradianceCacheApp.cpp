@@ -1,4 +1,5 @@
 #include "IrradianceCacheApp.h"
+#include "scene/globalcomponents/foray_aabbmanager.hpp"
 
 namespace foray::irradiance_cache {
 
@@ -12,12 +13,14 @@ namespace foray::irradiance_cache {
         mScene->UseDefaultCamera(INVERT_BLIT_INSTEAD);
         mScene->UpdateLightManager();
 
-        // FIXME temp: guessed size of the scene
-        const glm::vec3 dimensionsEstimate(20, 4, 20);
-        glm::vec3 origin = -dimensionsEstimate;
-        glm::vec3 extent = dimensionsEstimate * glm::vec3(2);
+        auto *aabbManager = mScene->MakeComponent<foray::scene::gcomp::AabbManager>();
+        aabbManager->CompileAabbs();
+        glm::vec3 origin = aabbManager->GetMinBounds();
+        glm::vec3 extent = aabbManager->GetMaxBounds() - origin;
         const glm::vec3 probeDistance(0.2);
         VkExtent3D imageExtent = IrradianceCache::calculateImageExtend(extent, probeDistance);
+        foray::logger()->info("IrradianceCache: dimensions ({}, {}, {})", imageExtent.width, imageExtent.height, imageExtent.depth);
+        foray::logger()->info("IrradianceCache: worldspace ({}, {}, {}) +({}, {}, {})", origin.x, origin.y, origin.z, extent.x, extent.y, extent.z);
         mIrradianceCache.emplace(&mContext, origin, extent, imageExtent);
 
         mIrradianceCacheFillStage.emplace(*mIrradianceCache, mScene.get());

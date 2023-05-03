@@ -3,6 +3,10 @@
 
 namespace foray::irradiance_cache {
 
+    // bindpoints
+    const uint32_t BINDPOINT_LIGHTS = 11;
+    const uint32_t BIND_IN_IRRADIANCE_CACHE = 12;
+
     // shaders
     const std::string FOLDER_IRRADIANCE_CACHE = "shaders/finalrt/";
     const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE + "raygen.rgen";

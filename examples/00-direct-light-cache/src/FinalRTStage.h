@@ -8,9 +8,6 @@
 
 namespace foray::irradiance_cache {
 
-    const uint32_t BINDPOINT_LIGHTS = 11;
-    const uint32_t BIND_IN_IRRADIANCE_CACHE = 12;
-
     class FinalRTStage;
 
     class FinalRTShaders {

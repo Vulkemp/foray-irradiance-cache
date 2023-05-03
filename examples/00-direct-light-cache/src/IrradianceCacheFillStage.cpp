@@ -11,6 +11,9 @@
 
 namespace foray::irradiance_cache {
 
+    // bindpoints
+    const uint32_t BINDPOINT_LIGHTS = 11;
+
     // shaders
     const std::string FOLDER_IRRADIANCE_CACHE = "shaders/irradiancecache/";
     const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE + "raygen.rgen";
@@ -43,6 +46,8 @@ namespace foray::irradiance_cache {
             mIrradianceCache(irradianceCache) {
         // disable push constant
         mRngSeedPushCOffset = ~0;
+
+        mLightManager = scene->GetComponent<foray::scene::gcomp::LightManager>();
         Init(irradianceCache.GetContext(), scene, envMap, noiseImage);
     }
 
@@ -54,7 +59,10 @@ namespace foray::irradiance_cache {
     void IrradianceCacheFillStage::CreateOrUpdateDescriptors() {
         using namespace stages::rtbindpoints;
 
-        mDescriptorSet.SetDescriptorAt(BIND_OUT_IMAGE, mIrradianceCache.GetImage(), VK_IMAGE_LAYOUT_GENERAL, nullptr, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, stages::RTSTAGEFLAGS);
+        mDescriptorSet.SetDescriptorAt(BINDPOINT_LIGHTS, mLightManager->GetBuffer().GetVkDescriptorInfo(),
+                                       VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, foray::stages::RTSTAGEFLAGS);
+        mDescriptorSet.SetDescriptorAt(BIND_OUT_IMAGE, mIrradianceCache.GetImage(), VK_IMAGE_LAYOUT_GENERAL, nullptr,
+                                       VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,stages::RTSTAGEFLAGS);
         RaytracingStageBase::CreateOrUpdateDescriptors();
     }
 

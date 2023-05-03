@@ -3,6 +3,7 @@
 #include "stages/foray_raytracingstage.hpp"
 #include "IrradianceCache.h"
 #include "VisiTest.h"
+#include "scene/globalcomponents/foray_lightmanager.hpp"
 
 namespace foray::irradiance_cache {
 
@@ -47,6 +48,7 @@ namespace foray::irradiance_cache {
         void RecordFrameBarriers(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo, std::vector<VkImageMemoryBarrier2> &imageBarriers,
                                  std::vector<VkBufferMemoryBarrier2> &bufferBarriers) override;
 
+        scene::gcomp::LightManager *mLightManager;
         IrradianceCache &mIrradianceCache;
         std::optional<IrradianceCacheShaderAccess> mIrradianceCacheShaderAccess;
         std::optional<IrradianceCacheFillShaders> mShaders;

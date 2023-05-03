@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project("foray-examples")
+project("foray-irradiance-cache")
 
 # Include Compiler Config (sets c++ 20 and compiler flags)
 include("foray/cmakescripts/compilerconfig.cmake")

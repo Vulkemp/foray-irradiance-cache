@@ -106,6 +106,4 @@ void main()
 	float rayDist = length(posWorldSpace - gl_WorldRayOriginEXT);
 	ReturnPayload.Radiance = directLight + probe.EmissiveColor;
 	ReturnPayload.Distance = length(posWorldSpace - gl_WorldRayOriginEXT);
-
-	ReturnPayload.Radiance *= readIrradianceCacheWorldSpace(posWorldSpace).xyz;
 }

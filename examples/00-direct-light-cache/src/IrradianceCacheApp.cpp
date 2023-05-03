@@ -3,6 +3,12 @@
 
 namespace foray::irradiance_cache {
 
+    const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/scene.gltf";
+    /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
+    constexpr bool INVERT_BLIT_INSTEAD = true;
+    const glm::vec3 PROBE_DISTANCE(0.2);
+    const bool IRRADIANCE_NEAREST_SAMPLING = false;
+
     void IrradianceCacheApp::ApiInit() {
         mScene = std::make_unique<scene::Scene>(&mContext);
         gltf::ModelConverter converter(mScene.get());
@@ -17,8 +23,7 @@ namespace foray::irradiance_cache {
         aabbManager->CompileAabbs();
         glm::vec3 origin = aabbManager->GetMinBounds();
         glm::vec3 extent = aabbManager->GetMaxBounds() - origin;
-        const glm::vec3 probeDistance(0.2);
-        VkExtent3D imageExtent = IrradianceCache::calculateImageExtend(extent, probeDistance);
+        VkExtent3D imageExtent = IrradianceCache::calculateImageExtend(extent, PROBE_DISTANCE);
         foray::logger()->info("IrradianceCache: dimensions ({}, {}, {})", imageExtent.width, imageExtent.height, imageExtent.depth);
         foray::logger()->info("IrradianceCache: worldspace ({}, {}, {}) +({}, {}, {})", origin.x, origin.y, origin.z, extent.x, extent.y, extent.z);
         mIrradianceCache.emplace(&mContext, origin, extent, imageExtent);
@@ -26,7 +31,7 @@ namespace foray::irradiance_cache {
         mIrradianceCacheFillStage.emplace(*mIrradianceCache, mScene.get());
         RegisterRenderStage(&*mIrradianceCacheFillStage);
 
-        mRtStage.emplace(*mIrradianceCache, &mContext, mScene.get());
+        mRtStage.emplace(*mIrradianceCache, &mContext, mScene.get(), IRRADIANCE_NEAREST_SAMPLING);
         RegisterRenderStage(&*mRtStage);
 
         mSwapCopyStage.Init(&mContext, mRtStage->GetRtOutput());

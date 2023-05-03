@@ -29,7 +29,7 @@ namespace foray::irradiance_cache {
         friend FinalRTShaders;
 
     public:
-        FinalRTStage(IrradianceCache &mIrradianceCache, core::Context *context, scene::Scene *scene);
+        FinalRTStage(IrradianceCache &mIrradianceCache, core::Context *context, scene::Scene *scene, bool irradianceNearestSampling = false);
 
     protected:
         void ApiCreateRtPipeline() override;

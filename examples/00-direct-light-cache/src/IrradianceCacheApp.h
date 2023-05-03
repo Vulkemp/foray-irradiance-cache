@@ -6,10 +6,6 @@
 
 namespace foray::irradiance_cache {
 
-    inline const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/scene.gltf";
-    /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
-    inline constexpr bool INVERT_BLIT_INSTEAD = true;
-
     class IrradianceCacheApp : public foray::base::DefaultAppBase {
     protected:
         void ApiInit() override;

@@ -21,7 +21,7 @@ namespace foray::irradiance_cache {
     public:
         IrradianceCache(foray::core::Context *context, glm::vec3 origin, glm::vec3 extent, VkExtent3D imageExtend);
 
-        // @brief select an imageExtent so that probes are probeDistance always apart, may increase extent to match probeDistance
+        // @brief select an imageExtent so that probes are PROBE_DISTANCE always apart, may increase extent to match PROBE_DISTANCE
         static VkExtent3D calculateImageExtend(glm::vec3 &extent, glm::vec3 probeDistance);
 
         FORAY_GETTER_V(Origin);

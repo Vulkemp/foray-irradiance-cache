@@ -43,15 +43,16 @@ namespace foray::irradiance_cache {
     }
 
     // stage
-    FinalRTStage::FinalRTStage(IrradianceCache &mIrradianceCache, foray::core::Context *context, foray::scene::Scene *scene) : mIrradianceCache(mIrradianceCache) {
+    FinalRTStage::FinalRTStage(IrradianceCache &mIrradianceCache, foray::core::Context *context, foray::scene::Scene *scene, bool irradianceNearestSampling) : mIrradianceCache(mIrradianceCache) {
         // disable push constant
         mRngSeedPushCOffset = ~0;
 
         mLightManager = scene->GetComponent<foray::scene::gcomp::LightManager>();
+        VkFilter filter = irradianceNearestSampling ? VkFilter::VK_FILTER_NEAREST : VkFilter::VK_FILTER_LINEAR;
         mIrradianceCacheSampler = core::Combined3dImageSampler(context, &mIrradianceCache.GetImage(), {
                 .sType                   = VkStructureType::VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-                .magFilter               = VkFilter::VK_FILTER_LINEAR,
-                .minFilter               = VkFilter::VK_FILTER_LINEAR,
+                .magFilter               = filter,
+                .minFilter               = filter,
                 .mipmapMode              = VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_LINEAR,
                 .addressModeU            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
                 .addressModeV            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,

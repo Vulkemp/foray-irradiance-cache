@@ -11,6 +11,7 @@
 
 namespace foray::irradiance_cache {
 
+    // shaders
     const std::string FOLDER_IRRADIANCE_CACHE = "shaders/irradiancecache/";
     const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE + "raygen.rgen";
 
@@ -28,6 +29,15 @@ namespace foray::irradiance_cache {
         mStage.mPipeline.Destroy();
     }
 
+    void IrradianceCacheFillStage::ApiCreateRtPipeline() {
+        mShaders.emplace(*this);
+    }
+
+    void IrradianceCacheFillStage::ApiDestroyRtPipeline() {
+        mShaders.reset();
+    }
+
+    // stage
     IrradianceCacheFillStage::IrradianceCacheFillStage(IrradianceCache &irradianceCache, scene::Scene *scene, core::CombinedImageSampler *envMap,
                                                        core::ManagedImage *noiseImage) :
             mIrradianceCache(irradianceCache) {
@@ -51,14 +61,6 @@ namespace foray::irradiance_cache {
     void IrradianceCacheFillStage::CreatePipelineLayout() {
         mIrradianceCacheShaderAccess.emplace(mIrradianceCache, mPipelineLayout, stages::RTSTAGEFLAGS);
         RaytracingStageBase::CreatePipelineLayout();
-    }
-
-    void IrradianceCacheFillStage::ApiCreateRtPipeline() {
-        mShaders.emplace(*this);
-    }
-
-    void IrradianceCacheFillStage::ApiDestroyRtPipeline() {
-        mShaders.reset();
     }
 
     void IrradianceCacheFillStage::RecordFrameBarriers(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo, std::vector<VkImageMemoryBarrier2> &imageBarriers,

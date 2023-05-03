@@ -26,10 +26,10 @@ namespace foray::irradiance_cache {
         mIrradianceCacheFillStage.emplace(*mIrradianceCache, mScene.get());
         RegisterRenderStage(&*mIrradianceCacheFillStage);
 
-        mRtStage.Init(&mContext, mScene.get());
-        RegisterRenderStage(&mRtStage);
+        mRtStage.emplace(*mIrradianceCache, &mContext, mScene.get());
+        RegisterRenderStage(&*mRtStage);
 
-        mSwapCopyStage.Init(&mContext, mRtStage.GetRtOutput());
+        mSwapCopyStage.Init(&mContext, mRtStage->GetRtOutput());
         mSwapCopyStage.SetFlipY(INVERT_BLIT_INSTEAD);
         RegisterRenderStage(&mSwapCopyStage);
 
@@ -52,7 +52,7 @@ namespace foray::irradiance_cache {
         renderInfo.GetInFlightFrame()->ClearSwapchainImage(cmdBuffer, renderInfo.GetImageLayoutCache());
         mScene->Update(renderInfo, cmdBuffer);
         mIrradianceCacheFillStage->RecordFrame(cmdBuffer, renderInfo);
-        mRtStage.RecordFrame(cmdBuffer, renderInfo);
+        mRtStage->RecordFrame(cmdBuffer, renderInfo);
         mSwapCopyStage.RecordFrame(cmdBuffer, renderInfo);
         renderInfo.GetInFlightFrame()->PrepareSwapchainImageForPresent(cmdBuffer, renderInfo.GetImageLayoutCache());
         cmdBuffer.Submit();
@@ -60,7 +60,7 @@ namespace foray::irradiance_cache {
 
     void IrradianceCacheApp::ApiDestroy() {
         mSwapCopyStage.Destroy();
-        mRtStage.Destroy();
+        mRtStage.reset();
         mIrradianceCacheFillStage.reset();
 
         mIrradianceCache.reset();

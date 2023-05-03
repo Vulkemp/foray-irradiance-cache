@@ -2,17 +2,21 @@
 
 #include "stages/foray_defaultraytracingstage.hpp"
 #include "scene/globalcomponents/foray_lightmanager.hpp"
+#include "core/foray_samplercollection.hpp"
 #include "VisiTest.h"
+#include "IrradianceCache.h"
 
 namespace foray::irradiance_cache {
 
     const uint32_t BINDPOINT_LIGHTS = 11;
+    const uint32_t BIND_IN_IRRADIANCE_CACHE = 12;
 
     class FinalRTStage;
 
     class FinalRTShaders {
     public:
         explicit FinalRTShaders(FinalRTStage &s);
+
         ~FinalRTShaders();
 
     private:
@@ -28,7 +32,7 @@ namespace foray::irradiance_cache {
         friend FinalRTShaders;
 
     public:
-        virtual void Init(core::Context *context, scene::Scene *scene);
+        FinalRTStage(IrradianceCache &mIrradianceCache, core::Context *context, scene::Scene *scene);
 
     protected:
         void ApiCreateRtPipeline() override;
@@ -37,9 +41,19 @@ namespace foray::irradiance_cache {
 
         void CreateOrUpdateDescriptors() override;
 
+        void CreatePipelineLayout() override;
+
+        void RecordFrameBarriers(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo, std::vector<VkImageMemoryBarrier2> &imageBarriers,
+                                 std::vector<VkBufferMemoryBarrier2> &bufferBarriers) override;
+
+        void RecordFrameBind(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo) override;
+
     private:
         std::optional<FinalRTShaders> mShaders;
         scene::gcomp::LightManager *mLightManager;
+        IrradianceCache &mIrradianceCache;
+        std::optional<IrradianceCacheShaderAccess> mIrradianceCacheShaderAccess;
+        core::Combined3dImageSampler mIrradianceCacheSampler;
     };
 
 }

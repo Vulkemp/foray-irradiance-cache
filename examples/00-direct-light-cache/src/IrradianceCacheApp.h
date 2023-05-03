@@ -27,7 +27,7 @@ namespace foray::irradiance_cache {
         std::optional<IrradianceCache> mIrradianceCache;
 
         // stages
-        FinalRTStage mRtStage;
+        std::optional<FinalRTStage> mRtStage;
         std::optional<IrradianceCacheFillStage> mIrradianceCacheFillStage;
         foray::stages::ImageToSwapchainStage mSwapCopyStage;
     };

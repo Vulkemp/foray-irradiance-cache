@@ -61,7 +61,7 @@ void writeIrradianceCache(uvec3 pixelSpace, vec4 value) {
 #define SET_IN_IRRADIANCE_CACHE 0
 #endif
 
-layout(set = SET_IN_IRRADIANCE_CACHE, binding = BIND_IN_IRRADIANCE_CACHE, rgba32f) uniform sampler3D IrradianceCache;
+layout(set = SET_IN_IRRADIANCE_CACHE, binding = BIND_IN_IRRADIANCE_CACHE) uniform sampler3D IrradianceCache;
 
 
 vec4 readIrradianceCache(vec3 irrSpace) {

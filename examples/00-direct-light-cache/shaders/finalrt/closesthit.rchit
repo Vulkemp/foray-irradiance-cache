@@ -29,6 +29,9 @@
 #include "../visitest/visitest.glsl"
 const VisiTestConfig visiTestConfig = {1, 0, 1};
 
+#define BIND_IN_IRRADIANCE_CACHE 12
+#include "../irradiancecache/irradiancecache.glsl"
+
 hitAttributeEXT vec2 attribs; // Barycentric coordinates
 
 // Offsets a ray origin slightly away from the surface to prevent self shadowing
@@ -150,4 +153,6 @@ void main()
     float rayDist = length(posWorldSpace - gl_WorldRayOriginEXT);
     ReturnPayload.Radiance = directLight + probe.EmissiveColor;
     ReturnPayload.Distance = length(posWorldSpace - gl_WorldRayOriginEXT);
+
+    ReturnPayload.Radiance *= readIrradianceCacheWorldSpace(posWorldSpace).xyz;
 }

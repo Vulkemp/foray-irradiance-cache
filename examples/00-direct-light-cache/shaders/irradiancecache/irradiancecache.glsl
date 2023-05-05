@@ -63,13 +63,8 @@ void writeIrradianceCache(uvec3 pixelSpace, vec4 value) {
 
 layout(set = SET_IN_IRRADIANCE_CACHE, binding = BIND_IN_IRRADIANCE_CACHE) uniform sampler3D IrradianceCache;
 
-
-vec4 readIrradianceCache(vec3 irrSpace) {
-	return texture(IrradianceCache, irrSpace);
-}
-
-vec4 readIrradianceCacheWorldSpace(vec3 worldSpace) {
-	return readIrradianceCache(transformWorldToIrradianceCache(worldSpace));
+vec4 readIrradianceCacheWorldSpace(vec3 worldSpace, vec3 normal) {
+	return texture(IrradianceCache, transformWorldToIrradianceCache(worldSpace) + (normal * 1.1f) / TracerConfig.irrConfig.imageExtent.xyz);
 }
 #endif
 

@@ -53,7 +53,7 @@ vec3 CollectDirectLight(in vec3 pos, in vec3 normal, in MaterialBufferObject mat
 	hit.wHalf = normalize(hit.wOut + hit.wIn);
 
 	// Calculate light reflected
-	vec3 irradianceCacheLight = readIrradianceCacheWorldSpace(pos, normal).xyz;
+	vec3 irradianceCacheLight = sampleIrradianceCache(pos, normal).xyz;
 	vec3 reflection = irradianceCacheLight * EvaluateMaterial(hit, material, probe);
 
 	return reflection * ReturnPayload.Attenuation;

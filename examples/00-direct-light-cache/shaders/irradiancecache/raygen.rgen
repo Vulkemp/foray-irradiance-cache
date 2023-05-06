@@ -77,7 +77,7 @@ uint CalculateSeedXTEA(uvec3 voxel, uint seed) {
 void main()
 {
 	const uvec3 originIrrPixel = gl_LaunchIDEXT.xyz;
-	const vec3 origin = transformIrradiancePixelToWorldSpace(originIrrPixel);
+	const vec3 origin = transformIrradiancePixelToWorld(originIrrPixel);
 	uint seed = CalculateSeedXTEA(originIrrPixel, TracerConfig.RngSeed);
 
 	vec3 irradiance = CollectDirectLight(origin, seed);

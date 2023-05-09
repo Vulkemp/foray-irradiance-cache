@@ -72,19 +72,6 @@ void writeIrradianceCache(uvec3 pixelSpace, vec4 value) {
 
 layout(set = SET_IN_IRRADIANCE_CACHE, binding = BIND_IN_IRRADIANCE_CACHE) uniform sampler3D IrradianceCache;
 
-vec4 sampleIrradianceCacheMix(bool beforeNormal[2], vec4 data[2], float t) {
-//	if (!beforeNormal[0] && !beforeNormal[1]) {
-//		// don't care: result will be ignored later
-//	} else
-	if (!beforeNormal[0]) {
-		return data[1];
-	} else if (!beforeNormal[1]) {
-		return data[0];
-	} else {
-		return mix(data[0], data[1], t);
-	}
-}
-
 vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 	vec3 voxelGlobal = transformWorldToIrradiancePixel(worldSpace);
 	ivec3 voxel = ivec3(voxelGlobal);
@@ -92,58 +79,60 @@ vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 
 	// fetch texels
 	// access: z*4+y*2+x
-	vec4 texels[8];
+	vec4 probe[8];
 	for (int z = 0; z < 2; z++) {
 		for (int y = 0; y < 2; y++) {
 			for (int x = 0; x < 2; x++) {
-				texels[z*4+y*2+x] = texelFetch(IrradianceCache, voxel + ivec3(x, y, z), 0);
+				probe[z*4+y*2+x] = texelFetch(IrradianceCache, voxel + ivec3(x, y, z), 0);
 			}
 		}
 	}
 
-	// true if coord is before normal plane, will be used multiple times
+	// weight of individual probes
 	// access: z*4+y*2+x
-	bool beforeNormal[8];
+	float probeWeight[8];
+	for (uint i = 0; i < 8; i++) {
+		probeWeight[i] = 1;
+	}
+
+	// probe weight *= based on before or after normal plane with soft threshold
+	{
+		const float softBias = 0.01;
+		const float softThreshold = 0.01;
+		for (int z = 0; z < 2; z++) {
+			for (int y = 0; y < 2; y++) {
+				for (int x = 0; x < 2; x++) {
+					float distanceToPlane = dot(vec3(x, y, z) - voxelFrac, normal) + softBias;
+					probeWeight[z*4+y*2+x] *= clamp(distanceToPlane / softThreshold, 0, 1);
+				}
+			}
+		}
+	}
+
+	// probe weight *= voxelFrac
 	for (int z = 0; z < 2; z++) {
 		for (int y = 0; y < 2; y++) {
 			for (int x = 0; x < 2; x++) {
-				beforeNormal[z*4+y*2+x] = dot(vec3(x, y, z) - voxelFrac, normal) > -0.01;
+				probeWeight[z*4+y*2+x] *=
+				(x > 0 ? voxelFrac.x : 1-voxelFrac.x)
+				* (y > 0 ? voxelFrac.y : 1-voxelFrac.y)
+				* (z > 0 ? voxelFrac.z : 1-voxelFrac.z);
 			}
 		}
 	}
 
-	// interpolate bilinearly but only if texel is before normal plane
-	vec4 result;
-	bool anyBeforeNormal;
+	vec4 result = vec4(0);
 	{
-		bool beforez[2];
-		vec4 resultz[2];
-		for (int z = 0; z < 2; z++) {
-			bool beforey[2];
-			vec4 resulty[2];
-			for (int y = 0; y < 2; y++) {
-				uint i = z*4+y*2;
-				vec4 resultx[2] = { texels[i], texels[i+1] };
-				bool beforex[2] = { beforeNormal[i], beforeNormal[i+1] };
-				resulty[y] = sampleIrradianceCacheMix(beforex, resultx, voxelFrac.x);
-				beforey[y] = beforex[0] || beforex[1];
-			}
-			resultz[z] = sampleIrradianceCacheMix(beforey, resulty, voxelFrac.y);
-			beforez[z] = beforey[0] || beforey[1];
+		float sumWeight = 0;
+		for (uint i = 0; i < 8; i++) {
+			result += probeWeight[i] * probe[i];
+			sumWeight += probeWeight[i];
 		}
-		anyBeforeNormal = beforez[0] || beforez[1];
-		result = sampleIrradianceCacheMix(beforez, resultz, voxelFrac.z);
-	}
-
-	// no voxels have been sampled -> black
-	// TODO may not be required?
-	if (!anyBeforeNormal) {
-		result = vec4(0, 0, 0, 0);
+		result = sumWeight > 0 ? (result / sumWeight) : vec4(0);
 	}
 
 	return result;
-//		return vec4(voxelFrac, 1);
-	//	return vec4(beforeNormal[2] ? 1 : 0);
+	//	return vec4(voxelFrac, 1);
 }
 #endif
 

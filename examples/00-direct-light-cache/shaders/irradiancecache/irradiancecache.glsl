@@ -77,17 +77,6 @@ vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 	ivec3 voxel = ivec3(voxelGlobal);
 	vec3 voxelFrac = fract(voxelGlobal);
 
-	// fetch texels
-	// access: z*4+y*2+x
-	vec4 probe[8];
-	for (int z = 0; z < 2; z++) {
-		for (int y = 0; y < 2; y++) {
-			for (int x = 0; x < 2; x++) {
-				probe[z*4+y*2+x] = texelFetch(IrradianceCache, voxel + ivec3(x, y, z), 0);
-			}
-		}
-	}
-
 	// weight of individual probes
 	// access: z*4+y*2+x
 	float probeWeight[8];
@@ -105,6 +94,17 @@ vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 					float distanceToPlane = dot(vec3(x, y, z) - voxelFrac, normal) + softBias;
 					probeWeight[z*4+y*2+x] *= clamp(distanceToPlane / softThreshold, 0, 1);
 				}
+			}
+		}
+	}
+
+	// fetch texels
+	// access: z*4+y*2+x
+	vec4 probe[8];
+	for (int z = 0; z < 2; z++) {
+		for (int y = 0; y < 2; y++) {
+			for (int x = 0; x < 2; x++) {
+				probe[z*4+y*2+x] = probeWeight[z*4+y*2+x] > 0.001 ? texelFetch(IrradianceCache, voxel + ivec3(x, y, z), 0) : vec4(0);
 			}
 		}
 	}

@@ -73,7 +73,10 @@ void writeIrradianceCache(uvec3 pixelSpace, vec4 value) {
 layout(set = SET_IN_IRRADIANCE_CACHE, binding = BIND_IN_IRRADIANCE_CACHE) uniform sampler3D IrradianceCache;
 
 vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
-	vec3 voxelGlobal = transformWorldToIrradiancePixel(worldSpace);
+	const float normalOffsetFactor = 0.3;
+	vec3 normalOffset = normal * normalOffsetFactor;
+
+	vec3 voxelGlobal = transformWorldToIrradiancePixel(worldSpace + normalOffset);
 	ivec3 voxel = ivec3(voxelGlobal);
 	vec3 voxelFrac = fract(voxelGlobal);
 
@@ -91,7 +94,7 @@ vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 		for (int z = 0; z < 2; z++) {
 			for (int y = 0; y < 2; y++) {
 				for (int x = 0; x < 2; x++) {
-					float distanceToPlane = dot(vec3(x, y, z) - voxelFrac, normal) + softBias;
+					float distanceToPlane = dot(vec3(x, y, z) - voxelFrac + normalOffset, normal) + softBias;
 					probeWeight[z*4+y*2+x] *= clamp(distanceToPlane / softThreshold, 0, 1);
 				}
 			}

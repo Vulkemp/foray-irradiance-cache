@@ -15,7 +15,7 @@ namespace foray::irradiance_cache {
     const uint32_t BINDPOINT_LIGHTS = 11;
 
     // shaders
-    const std::string FOLDER_IRRADIANCE_CACHE = "shaders/irradiancecache/";
+    const std::string FOLDER_IRRADIANCE_CACHE = "shaders/irradiancecachefill/";
     const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE + "raygen.rgen";
 
     IrradianceCacheFillShaders::IrradianceCacheFillShaders(IrradianceCacheFillStage &s) : mStage(s) {

@@ -17,7 +17,7 @@
 const VisiTestConfig visiTestConfig = { 0, 0, 0 };
 
 #define BIND_OUT_IRRADIANCE_CACHE BIND_OUT_IMAGE
-#include "irradiancecache.glsl"
+#include "../irradiancecache/irradiancecache.glsl"
 
 const bool DEBUG_PATTERN = false;
 const uint DEBUG_PATTERN_GRADIANTS = 10;

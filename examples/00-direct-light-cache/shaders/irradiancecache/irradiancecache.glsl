@@ -112,6 +112,14 @@ vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 		}
 	}
 
+	// ignore dark texels
+	for (uint i = 0; i < 8; i++) {
+		const float compeltelyDarkTexelsLimit = 0.01;
+		if ((abs(probe[i].x) + abs(probe[i].y) + abs(probe[i].z)) < compeltelyDarkTexelsLimit) {
+			probeWeight[i] = 0;
+		}
+	}
+
 	// probe weight *= voxelFrac
 	for (int z = 0; z < 2; z++) {
 		for (int y = 0; y < 2; y++) {

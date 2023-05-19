@@ -67,13 +67,6 @@ vec3 CollectDirectLight(vec3 pos, uint seed)
 	return directLightWeight > 0 ? directLightSum / directLightWeight : vec3(0);
 }
 
-// [10bits x] 0 [10bits y] 0 [10 bits z]
-//            ^ bit 21     ^ bit 10
-uint CalculateSeedXTEA(uvec3 voxel, uint seed) {
-	const uint mask = (1 << 10) - 1;
-	return CalculateSeedXTEA((voxel.x & mask) << 22 | (voxel.y & mask) << 11 | (voxel.z & mask), seed);
-}
-
 void main()
 {
 	const uvec3 originIrrPixel = gl_LaunchIDEXT.xyz;

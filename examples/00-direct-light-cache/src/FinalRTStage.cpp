@@ -83,11 +83,11 @@ namespace foray::irradiance_cache {
         DefaultRaytracingStageBase::CreatePipelineLayout();
     }
 
-    void FinalRTStage::RecordFrameBarriers(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo, std::vector<VkImageMemoryBarrier2> &imageBarriers,
-                                           std::vector<VkBufferMemoryBarrier2> &bufferBarriers) {
-        DefaultRaytracingStageBase::RecordFrameBarriers(cmdBuffer, renderInfo, imageBarriers, bufferBarriers);
+    void FinalRTStage::RecordFrameBarriers(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo, std::vector<VkImageMemoryBarrier2> &imageFullBarriers,
+                                           std::vector<VkImageMemoryBarrier2> &imageByRegionBarriers, std::vector<VkBufferMemoryBarrier2> &bufferBarriers) {
+        DefaultRaytracingStageBase::RecordFrameBarriers(cmdBuffer, renderInfo, imageFullBarriers, imageByRegionBarriers, bufferBarriers);
 
-        imageBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetImage(), core::ImageLayoutCache::Barrier2{
+        imageFullBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetImage(), core::ImageLayoutCache::Barrier2{
                 .SrcStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
                 .SrcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT,
                 .DstStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,

@@ -7,26 +7,26 @@
 
 namespace foray::irradiance_cache {
 
-    class IrradianceCacheFillStage;
+    class IrradianceCacheIndirectStage;
 
-    class IrradianceCacheFillShaders {
+    class IrradianceCacheIndirectShaders {
     public:
-        explicit IrradianceCacheFillShaders(IrradianceCacheFillStage &s);
+        explicit IrradianceCacheIndirectShaders(IrradianceCacheIndirectStage &s);
 
-        ~IrradianceCacheFillShaders();
+        ~IrradianceCacheIndirectShaders();
 
     private:
-        IrradianceCacheFillStage &mStage;
+        IrradianceCacheIndirectStage &mStage;
         core::ShaderModule mRaygen;
         VisiTest mVisiTest;
     };
 
-    class IrradianceCacheFillStage : public stages::RaytracingStageBase {
-        friend IrradianceCacheFillShaders;
+    class IrradianceCacheIndirectStage : public stages::RaytracingStageBase {
+        friend IrradianceCacheIndirectShaders;
 
     public:
-        IrradianceCacheFillStage(IrradianceCache &irradianceCache, scene::Scene *scene, core::CombinedImageSampler *envMap = nullptr,
-                                 core::ManagedImage *noiseImage = nullptr);
+        IrradianceCacheIndirectStage(IrradianceCache &irradianceCache, scene::Scene *scene, core::CombinedImageSampler *envMap = nullptr,
+                                   core::ManagedImage *noiseImage = nullptr);
 
         FORAY_GETTER_R(IrradianceCache);
 
@@ -51,6 +51,6 @@ namespace foray::irradiance_cache {
         scene::gcomp::LightManager *mLightManager;
         IrradianceCache &mIrradianceCache;
         std::optional<IrradianceCacheShaderAccess> mIrradianceCacheShaderAccess;
-        std::optional<IrradianceCacheFillShaders> mShaders;
+        std::optional<IrradianceCacheIndirectShaders> mShaders;
     };
 }

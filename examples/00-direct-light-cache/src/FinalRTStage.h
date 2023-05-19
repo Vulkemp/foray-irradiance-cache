@@ -29,7 +29,7 @@ namespace foray::irradiance_cache {
         friend FinalRTShaders;
 
     public:
-        FinalRTStage(IrradianceCache &mIrradianceCache, core::Context *context, scene::Scene *scene, bool irradianceNearestSampling = false);
+        FinalRTStage(IrradianceCache &mIrradianceCache, foray::core::Context *context, foray::scene::Scene *scene);
 
     protected:
         void ApiCreateRtPipeline() override;
@@ -50,7 +50,6 @@ namespace foray::irradiance_cache {
         scene::gcomp::LightManager *mLightManager;
         IrradianceCache &mIrradianceCache;
         std::optional<IrradianceCacheShaderAccess> mIrradianceCacheShaderAccess;
-        core::Combined3dImageSampler mIrradianceCacheSampler;
     };
 
 }

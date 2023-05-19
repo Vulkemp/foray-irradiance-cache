@@ -1,4 +1,5 @@
 #include "IrradianceCache.h"
+#include "core/foray_samplercollection.hpp"
 
 namespace foray::irradiance_cache {
 
@@ -16,7 +17,8 @@ namespace foray::irradiance_cache {
             mExtent(extent) {
         assert(isPositive(extent));
         VkImageUsageFlags usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
-        mImage.Create(context, usage, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, imageExtend, "Irradiance Cache");
+        mIndirectImage.Create(context, usage, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, imageExtend, "Irradiance Cache Indirect");
+        mTempImage.Create(context, usage, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, imageExtend, "Irradiance Cache Temp");
     }
 
     VkExtent3D IrradianceCache::calculateImageExtend(glm::vec3 &extent, glm::vec3 probeDistance) {
@@ -45,8 +47,10 @@ namespace foray::irradiance_cache {
                 glm::vec4(irradianceCache.mOrigin, 0.f),
                 glm::vec4(irradianceCache.mExtent, 0.f),
                 glm::vec4(imageExtent.width, imageExtent.height, imageExtent.depth, 0.f),
+                glm::uvec4((uint32_t) irradianceCache.mMode, irradianceCache.mClearCache ? 1 : 0, 0, 0),
                 (uint32_t) renderInfo.GetFrameNumber()
         };
         vkCmdPushConstants(cmdBuffer, pipelineLayout, stageFlags, 0, sizeof(ps), &ps);
+        irradianceCache.mClearCache = false;
     }
 }

@@ -7,7 +7,6 @@ namespace foray::irradiance_cache {
     /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
     constexpr bool INVERT_BLIT_INSTEAD = true;
     const glm::vec3 PROBE_DISTANCE(0.2);
-    const bool IRRADIANCE_NEAREST_SAMPLING = false;
 
     void IrradianceCacheApp::ApiInit() {
         mScene = std::make_unique<scene::Scene>(&mContext);
@@ -28,10 +27,13 @@ namespace foray::irradiance_cache {
         foray::logger()->info("IrradianceCache: worldspace ({}, {}, {}) +({}, {}, {})", origin.x, origin.y, origin.z, extent.x, extent.y, extent.z);
         mIrradianceCache.emplace(&mContext, origin, extent, imageExtent);
 
-        mIrradianceCacheFillStage.emplace(*mIrradianceCache, mScene.get());
-        RegisterRenderStage(&*mIrradianceCacheFillStage);
+        mIrradianceCacheDirectStage.emplace(*mIrradianceCache, mScene.get());
+        RegisterRenderStage(&*mIrradianceCacheDirectStage);
 
-        mRtStage.emplace(*mIrradianceCache, &mContext, mScene.get(), IRRADIANCE_NEAREST_SAMPLING);
+        mIrradianceCacheIndirectStage.emplace(*mIrradianceCache, mScene.get());
+        RegisterRenderStage(&*mIrradianceCacheIndirectStage);
+
+        mRtStage.emplace(*mIrradianceCache, &mContext, mScene.get());
         RegisterRenderStage(&*mRtStage);
 
         mSwapCopyStage.Init(&mContext, mRtStage->GetRtOutput());
@@ -56,7 +58,8 @@ namespace foray::irradiance_cache {
         cmdBuffer.Begin();
         renderInfo.GetInFlightFrame()->ClearSwapchainImage(cmdBuffer, renderInfo.GetImageLayoutCache());
         mScene->Update(renderInfo, cmdBuffer);
-        mIrradianceCacheFillStage->RecordFrame(cmdBuffer, renderInfo);
+        mIrradianceCacheDirectStage->RecordFrame(cmdBuffer, renderInfo);
+        mIrradianceCacheIndirectStage->RecordFrame(cmdBuffer, renderInfo);
         mRtStage->RecordFrame(cmdBuffer, renderInfo);
         mSwapCopyStage.RecordFrame(cmdBuffer, renderInfo);
         renderInfo.GetInFlightFrame()->PrepareSwapchainImageForPresent(cmdBuffer, renderInfo.GetImageLayoutCache());
@@ -66,7 +69,8 @@ namespace foray::irradiance_cache {
     void IrradianceCacheApp::ApiDestroy() {
         mSwapCopyStage.Destroy();
         mRtStage.reset();
-        mIrradianceCacheFillStage.reset();
+        mIrradianceCacheIndirectStage.reset();
+        mIrradianceCacheDirectStage.reset();
 
         mIrradianceCache.reset();
         mScene = nullptr;

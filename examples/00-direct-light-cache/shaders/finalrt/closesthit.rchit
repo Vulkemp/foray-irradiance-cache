@@ -3,8 +3,6 @@
 #extension GL_EXT_ray_tracing : enable // Raytracing
 #extension GL_EXT_nonuniform_qualifier : enable // Required for asserting that some array indexing is done with non-uniform indices
 
-// Include structs and bindings
-
 #include "rt_common/bindpoints.glsl"// Bindpoints (= descriptor set layout)
 #include "common/materialbuffer.glsl"// Material buffer for material information and texture array
 #include "rt_common/geometrymetabuffer.glsl"// GeometryMeta information
@@ -12,6 +10,7 @@
 #include "common/normaltbn.glsl"// Normal calculation in tangent space
 #include "common/lcrng.glsl"
 #include "rt_common/tlas.glsl"// Binds Top Level Acceleration Structure
+#include "config.glsl"
 
 #define BIND_SIMPLIFIEDLIGHTARRAY 11
 #include "rt_common/simplifiedlights.glsl"
@@ -19,8 +18,6 @@
 #include "shading/constants.glsl"
 #include "shading/sampling.glsl"
 #include "shading/material.glsl"
-
-// Declare hitpayloads
 
 #define HITPAYLOAD_IN
 #define HITPAYLOAD_OUT
@@ -30,7 +27,7 @@
 const VisiTestConfig visiTestConfig = { 1, 0, 1 };
 
 #define BIND_IN_IRRADIANCE_CACHE 12
-#include "../irradiancecache/irradiancecache.glsl"
+#include "../irradiancecache/bindin.glsl"
 
 hitAttributeEXT vec2 attribs;// Barycentric coordinates
 

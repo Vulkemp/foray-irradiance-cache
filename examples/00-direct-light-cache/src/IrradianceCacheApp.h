@@ -2,7 +2,9 @@
 
 #include <foray_api.hpp>
 #include "FinalRTStage.h"
-#include "IrradianceCacheFillStage.hpp"
+#include "IrradianceCacheDirectStage.h"
+#include "IrrradianceCacheMode.h"
+#include "IrradianceCacheIndirectStage.h"
 
 namespace foray::irradiance_cache {
 
@@ -24,7 +26,8 @@ namespace foray::irradiance_cache {
 
         // stages
         std::optional<FinalRTStage> mRtStage;
-        std::optional<IrradianceCacheFillStage> mIrradianceCacheFillStage;
+        std::optional<IrradianceCacheDirectStage> mIrradianceCacheDirectStage;
+        std::optional<IrradianceCacheIndirectStage> mIrradianceCacheIndirectStage;
         foray::stages::ImageToSwapchainStage mSwapCopyStage;
     };
 

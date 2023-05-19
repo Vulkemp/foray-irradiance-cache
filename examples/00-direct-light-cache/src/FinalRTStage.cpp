@@ -4,19 +4,19 @@
 namespace foray::irradiance_cache {
 
     // bindpoints
-    const uint32_t BINDPOINT_LIGHTS = 11;
+    const uint32_t BIND_LIGHTS = 11;
     const uint32_t BIND_IN_IRRADIANCE_CACHE = 12;
 
     // shaders
-    const std::string FOLDER_IRRADIANCE_CACHE = "shaders/finalrt/";
-    const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE + "raygen.rgen";
-    const std::string CLOSESTHIT_FILE = FOLDER_IRRADIANCE_CACHE + "closesthit.rchit";
-    const std::string ANYHIT_FILE = FOLDER_IRRADIANCE_CACHE + "anyhit.rahit";
-    const std::string MISS_FILE = FOLDER_IRRADIANCE_CACHE + "miss.rmiss";
+    const std::string FOLDER_IRRADIANCE_CACHE_DIRECT = "shaders/finalrt/";
+    const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "raygen.rgen";
+    const std::string CLOSESTHIT_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "closesthit.rchit";
+    const std::string ANYHIT_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "anyhit.rahit";
+    const std::string MISS_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "miss.rmiss";
 
     FinalRTShaders::FinalRTShaders(FinalRTStage &s) :
             mStage(s) {
-        foray::core::ShaderCompilerConfig options{.IncludeDirs = {FORAY_SHADER_DIR}};
+        foray::core::ShaderCompilerConfig options{.IncludeDirs = {FORAY_SHADER_DIR, EXAMPLE_SHADER_DIR}};
         s.mShaderKeys.push_back(mRaygen.CompileFromSource(s.mContext, RAYGEN_FILE, options));
         s.mShaderKeys.push_back(mClosestHit.CompileFromSource(s.mContext, CLOSESTHIT_FILE, options));
         s.mShaderKeys.push_back(mAnyHit.CompileFromSource(s.mContext, ANYHIT_FILE, options));
@@ -43,38 +43,19 @@ namespace foray::irradiance_cache {
     }
 
     // stage
-    FinalRTStage::FinalRTStage(IrradianceCache &mIrradianceCache, foray::core::Context *context, foray::scene::Scene *scene, bool irradianceNearestSampling) : mIrradianceCache(mIrradianceCache) {
+    FinalRTStage::FinalRTStage(IrradianceCache &mIrradianceCache, foray::core::Context *context, foray::scene::Scene *scene) : mIrradianceCache(mIrradianceCache) {
         // disable push constant
         mRngSeedPushCOffset = ~0;
 
         mLightManager = scene->GetComponent<foray::scene::gcomp::LightManager>();
-        VkFilter filter = irradianceNearestSampling ? VkFilter::VK_FILTER_NEAREST : VkFilter::VK_FILTER_LINEAR;
-        mIrradianceCacheSampler = core::Combined3dImageSampler(context, &mIrradianceCache.GetImage(), {
-                .sType                   = VkStructureType::VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-                .magFilter               = filter,
-                .minFilter               = filter,
-                .mipmapMode              = VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_LINEAR,
-                .addressModeU            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
-                .addressModeV            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
-                .addressModeW            = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
-                .mipLodBias              = 0.f,
-                .anisotropyEnable        = VK_FALSE,
-                .maxAnisotropy           = 0,
-                .compareEnable           = VK_FALSE,
-                .compareOp               = {},
-                .minLod                  = 0,
-                .maxLod                  = VK_LOD_CLAMP_NONE,
-                .borderColor             = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK,
-                .unnormalizedCoordinates = VK_FALSE
-        });
         foray::stages::DefaultRaytracingStageBase::Init(context, scene);
     }
 
     void FinalRTStage::CreateOrUpdateDescriptors() {
-        mDescriptorSet.SetDescriptorAt(BINDPOINT_LIGHTS, mLightManager->GetBuffer().GetVkDescriptorInfo(),
+        mDescriptorSet.SetDescriptorAt(BIND_LIGHTS, mLightManager->GetBuffer().GetVkDescriptorInfo(),
                                        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, foray::stages::RTSTAGEFLAGS);
-        mDescriptorSet.SetDescriptorAt(BIND_IN_IRRADIANCE_CACHE, mIrradianceCache.GetImage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mIrradianceCacheSampler,
-                                       VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, stages::RTSTAGEFLAGS);
+        mDescriptorSet.SetDescriptorAt(BIND_IN_IRRADIANCE_CACHE, mIrradianceCache.GetIndirectImage(), VK_IMAGE_LAYOUT_GENERAL,
+                                       nullptr, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, stages::RTSTAGEFLAGS);
         DefaultRaytracingStageBase::CreateOrUpdateDescriptors();
     }
 
@@ -87,12 +68,12 @@ namespace foray::irradiance_cache {
                                            std::vector<VkImageMemoryBarrier2> &imageByRegionBarriers, std::vector<VkBufferMemoryBarrier2> &bufferBarriers) {
         DefaultRaytracingStageBase::RecordFrameBarriers(cmdBuffer, renderInfo, imageFullBarriers, imageByRegionBarriers, bufferBarriers);
 
-        imageFullBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetImage(), core::ImageLayoutCache::Barrier2{
+        imageFullBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetIndirectImage(), core::ImageLayoutCache::Barrier2{
                 .SrcStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
                 .SrcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT,
                 .DstStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
                 .DstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT,
-                .NewLayout     = VkImageLayout::VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+                .NewLayout     = VkImageLayout::VK_IMAGE_LAYOUT_GENERAL
         }));
     }
 

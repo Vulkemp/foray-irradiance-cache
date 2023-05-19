@@ -28,6 +28,9 @@ function (foray_example)
     target_compile_options(${PROJECT_NAME} PUBLIC "-DDATA_DIR=\"${CMAKE_SOURCE_DIR}/data\"")
     target_compile_options(${PROJECT_NAME} PUBLIC "-DFORAY_SHADER_DIR=\"$CACHE{FORAY_SHADER_DIR}\"")
 
+    set(EXAMPLE_SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/shaders" CACHE PATH "Example shader directory")
+    target_compile_options(${PROJECT_NAME} PUBLIC "-DEXAMPLE_SHADER_DIR=\"$CACHE{EXAMPLE_SHADER_DIR}\"")
+
     # Link foray lib
     target_link_libraries(
     	${PROJECT_NAME}

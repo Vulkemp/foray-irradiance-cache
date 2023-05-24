@@ -1,0 +1,5 @@
+#include "rt_common/bindpoints.glsl"
+
+#define BIND_SIMPLIFIEDLIGHTARRAY 11
+#define BIND_IN_IRRADIANCE_CACHE 12
+#define BIND_OUT_IRRADIANCE_CACHE BIND_OUT_IMAGE

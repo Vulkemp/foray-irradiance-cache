@@ -2,20 +2,14 @@
 #extension GL_GOOGLE_include_directive : enable // Include files
 #extension GL_EXT_ray_tracing : enable // Raytracing
 
-#include "rt_common/bindpoints.glsl"// Defines constants for the bind indices that RaytracingStage uses
-#include "common/camera.glsl"// Binds camera matrices UBO
-#include "rt_common/tlas.glsl"// Binds Top Level Acceleration Structure
+#include "bindpoints.glsl"
+#include "common/camera.glsl"
+#include "rt_common/tlas.glsl"
 #include "common/xteanoise.glsl"
 #include "common/lcrng.glsl"
 #include "shading/constants.glsl"
-#include "config.glsl"
-
-#define BIND_SIMPLIFIEDLIGHTARRAY 11
-#include "rt_common/simplifiedlights.glsl"
-
-#define BIND_IN_IRRADIANCE_CACHE 12
+#include "directlight.glsl"
 #include "irradiancecache/bindin.glsl"
-#define BIND_OUT_IRRADIANCE_CACHE BIND_OUT_IMAGE
 #include "irradiancecache/bindout.glsl"
 
 vec3 TraceForNeighbours(vec3 origin, uint seed)
@@ -40,7 +34,7 @@ void main()
 		irradiance = vec3(float((irrTexel.x + irrTexel.y + irrTexel.z) % levels) / levels);
 	} else {
 		// not implemented! -> specific recognizable color
-		irradiance = vec3(1, 0.5, 1);
+		irradiance = vec3(1, 0.5, 0/0);
 	}
 	writeIrradianceCache(irrTexel, vec4(irradiance, 0.0));
 }

@@ -3,9 +3,7 @@
 #extension GL_EXT_ray_tracing : enable // Raytracing
 #extension GL_EXT_nonuniform_qualifier : enable // Required for asserting that some array indexing is done with non-uniform indices
 
-// Include structs and bindings
-
-#include "rt_common/bindpoints.glsl" // Bindpoints (= descriptor set layout)
+#include "bindpoints.glsl"
 #include "rt_common/tlas.glsl"
 #include "common/materialbuffer.glsl" // Material buffer for material information and texture array
 #include "rt_common/geometrymetabuffer.glsl" // GeometryMeta information

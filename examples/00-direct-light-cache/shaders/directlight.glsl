@@ -1,4 +1,5 @@
 #include "rt_common/simplifiedlights.glsl"
+#include "visitest/visitest.glsl"
 
 // Do a maximum of 5 light tests (since each is a ray cast, which is quite expensive)
 const uint DIRECT_LIGHT_TEST_CNT = 5;

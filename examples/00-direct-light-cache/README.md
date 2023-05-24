@@ -1,5 +1,18 @@
 # Irradiance Cache example
+ic: Irradiance Cache
 
+## Controls
+* WASD: movement
+* Space: capture mouse
+* T, G: decrement / increment rendering mode, cycling though:
+  * INDIRECT_TRACE_DIRECT_TRACE: trace everything
+  * INDIRECT_IC_DIRECT_TRACE: ic indirect, raytrace direct **default**
+  * INDIRECT_IC: only ic indirect, part #1 of default
+  * DIRECT_TRACE: only direct raytrace, part #2 of default
+  * DIRECT_IC: direct illumination though ic
+  * DEBUG_PATTERN: a debug pattern repeating every 10 probes
+
+## Code
 The type [IrradianceCache](src/IrradianceCache.h) manages all the resources required for the Irradiance Cache.
 
 ## Stages

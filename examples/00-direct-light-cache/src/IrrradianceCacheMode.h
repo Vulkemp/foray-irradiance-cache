@@ -13,4 +13,14 @@ namespace foray::irradiance_cache {
         DEFAULT = INDIRECT_IC_DIRECT_TRACE,
     };
 
+    inline const char* MODE_NAMES[] {
+            "INDIRECT_TRACE_DIRECT_TRACE",
+            "INDIRECT_IC_DIRECT_TRACE",
+            "INDIRECT_IC",
+            "DIRECT_TRACE",
+            "DIRECT_IC",
+            "DEBUG_PATTERN",
+            "MAX_ENUM",
+    };
+
 }

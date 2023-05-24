@@ -20,6 +20,8 @@ namespace foray::irradiance_cache {
 
         void ApiDestroy() override;
 
+        void ImGui();
+
     private:
         std::unique_ptr<foray::scene::Scene> mScene;
         std::optional<IrradianceCache> mIrradianceCache;
@@ -29,6 +31,7 @@ namespace foray::irradiance_cache {
         std::optional<IrradianceCacheDirectStage> mIrradianceCacheDirectStage;
         std::optional<IrradianceCacheIndirectStage> mIrradianceCacheIndirectStage;
         foray::stages::ImageToSwapchainStage mSwapCopyStage;
+        foray::stages::ImguiStage mImguiStage;
     };
 
 }

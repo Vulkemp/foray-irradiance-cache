@@ -1,5 +1,6 @@
 #include "IrradianceCacheApp.h"
 #include "scene/globalcomponents/foray_aabbmanager.hpp"
+#include <imgui/imgui.h>
 
 namespace foray::irradiance_cache {
 
@@ -40,6 +41,10 @@ namespace foray::irradiance_cache {
         mSwapCopyStage.SetFlipY(INVERT_BLIT_INSTEAD);
         RegisterRenderStage(&mSwapCopyStage);
 
+        mImguiStage.InitForSwapchain(&mContext);
+        mImguiStage.AddWindowDraw([this]() { this->ImGui(); });
+        RegisterRenderStage(&mImguiStage);
+
         DefaultAppBase::ApiInit();
     }
 
@@ -50,6 +55,7 @@ namespace foray::irradiance_cache {
 
     void IrradianceCacheApp::ApiOnEvent(const osi::Event *event) {
         mScene->InvokeOnEvent(event);
+        mImguiStage.ProcessSdlEvent(&(event->RawSdlEventData));
         DefaultAppBase::ApiOnEvent(event);
 
         if (event->Type == osi::Event::EType::InputBinary) {
@@ -85,12 +91,22 @@ namespace foray::irradiance_cache {
         mIrradianceCacheIndirectStage->RecordFrame(cmdBuffer, renderInfo);
         mRtStage->RecordFrame(cmdBuffer, renderInfo);
         mSwapCopyStage.RecordFrame(cmdBuffer, renderInfo);
+        mImguiStage.RecordFrame(cmdBuffer, renderInfo);
         renderInfo.GetInFlightFrame()->PrepareSwapchainImageForPresent(cmdBuffer, renderInfo.GetImageLayoutCache());
         cmdBuffer.Submit();
         mIrradianceCache->frameFinished();
     }
 
+    void IrradianceCacheApp::ImGui() {
+        ImGui::Begin("window");
+        foray::base::RenderLoop::FrameTimeAnalysis analysis = mRenderLoop.AnalyseFrameTimes();
+        ImGui::Text("Mode: %s", MODE_NAMES[(size_t) mIrradianceCache->GetMode()]);
+        ImGui::Text("FPS: %f avg %f min", analysis.Count > 0 ? 1.f / analysis.AvgFrameTime : 0, analysis.Count > 0 ? 1.f / analysis.MaxFrameTime : 0);
+        ImGui::End();
+    }
+
     void IrradianceCacheApp::ApiDestroy() {
+        mImguiStage.Destroy();
         mSwapCopyStage.Destroy();
         mRtStage.reset();
         mIrradianceCacheIndirectStage.reset();

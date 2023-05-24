@@ -50,8 +50,10 @@ namespace foray::irradiance_cache {
         }
 
         inline void SetMode(IrradianceCacheMode mode) {
-            mMode = mode;
-            clearCache();
+            if (mMode != mode) {
+                mMode = mode;
+                clearCache();
+            }
         }
 
         inline void clearCache() {

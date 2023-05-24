@@ -1,5 +1,10 @@
+#ifndef EXAMPLE_BINDPOINTS_GLSL
+#define EXAMPLE_BINDPOINTS_GLSL
+
 #include "rt_common/bindpoints.glsl"
 
 #define BIND_SIMPLIFIEDLIGHTARRAY 11
 #define BIND_IN_IRRADIANCE_CACHE 12
 #define BIND_OUT_IRRADIANCE_CACHE BIND_OUT_IMAGE
+
+#endif

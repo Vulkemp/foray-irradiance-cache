@@ -10,24 +10,16 @@ namespace foray::irradiance_cache {
     // shaders
     const std::string FOLDER_IRRADIANCE_CACHE_DIRECT = "shaders/finalrt/";
     const std::string RAYGEN_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "raygen.rgen";
-    const std::string CLOSESTHIT_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "closesthit.rchit";
-    const std::string ANYHIT_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "anyhit.rahit";
-    const std::string MISS_FILE = FOLDER_IRRADIANCE_CACHE_DIRECT + "miss.rmiss";
 
     FinalRTShaders::FinalRTShaders(FinalRTStage &s) : mStage(s) {
         foray::core::ShaderCompilerConfig options{.IncludeDirs = {FORAY_SHADER_DIR, EXAMPLE_SHADER_DIR}};
         mVisiTest.emplace(s.mContext, options, 1);
+        mProbeMat.emplace(s.mContext, options, 0);
 
         s.mShaderKeys.push_back(mRaygen.CompileFromSource(s.mContext, RAYGEN_FILE, options));
-        s.mShaderKeys.push_back(mClosestHit.CompileFromSource(s.mContext, CLOSESTHIT_FILE, options));
-        s.mShaderKeys.push_back(mAnyHit.CompileFromSource(s.mContext, ANYHIT_FILE, options));
-        s.mShaderKeys.push_back(mMiss.CompileFromSource(s.mContext, MISS_FILE, options));
-
         s.mPipeline.GetRaygenSbt().SetGroup(0, &mRaygen);
-        s.mPipeline.GetHitSbt().SetGroup(0, &mClosestHit, &mAnyHit, nullptr);
-        s.mPipeline.GetMissSbt().SetGroup(0, &mMiss);
+        mProbeMat->Compile(s.mContext, options, s.mShaderKeys, s.mPipeline);
         mVisiTest->Compile(s.mContext, options, s.mShaderKeys, s.mPipeline);
-
         s.mPipeline.Build(s.mContext, s.mPipelineLayout);
     }
 

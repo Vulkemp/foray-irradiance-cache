@@ -4,13 +4,12 @@
 
 #include "bindpoints.glsl"
 #include "common/camera.glsl"
-#include "rt_common/tlas.glsl"
 #include "common/xteanoise.glsl"
-#include "common/lcrng.glsl"
 #include "shading/constants.glsl"
 #include "directlight.glsl"
 #include "irradiancecache/bindin.glsl"
 #include "irradiancecache/bindout.glsl"
+#include "visitest/visitest.glsl"
 
 vec3 TraceForNeighbours(vec3 origin, uint seed)
 {

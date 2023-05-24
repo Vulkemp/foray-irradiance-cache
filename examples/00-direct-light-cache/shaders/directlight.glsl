@@ -1,10 +1,11 @@
 #include "rt_common/simplifiedlights.glsl"
 #include "visitest/visitest.glsl"
+#include "common/lcrng.glsl"
 
 // Do a maximum of 5 light tests (since each is a ray cast, which is quite expensive)
 const uint DIRECT_LIGHT_TEST_CNT = 5;
 
-vec3 CollectDirectLight(vec3 pos, uint seed)
+vec3 collectDirectLight(vec3 pos, uint seed)
 {
 	const uint lightTestCount = min(DIRECT_LIGHT_TEST_CNT, SimplifiedLights.Count);
 

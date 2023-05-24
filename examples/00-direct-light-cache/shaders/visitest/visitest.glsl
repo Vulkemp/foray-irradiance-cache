@@ -1,6 +1,8 @@
 #ifndef VISITEST_GLSL
 #define VISITEST_GLSL
 
+#include "rt_common/tlas.glsl"
+
 #define VISIPAYLOAD_OUT
 #include "payload.glsl"
 

@@ -4,14 +4,11 @@
 
 #include "bindpoints.glsl"
 #include "common/camera.glsl"
-#include "rt_common/tlas.glsl"
 #include "common/xteanoise.glsl"
-#include "common/lcrng.glsl"
 #include "shading/constants.glsl"
 #include "directlight.glsl"
 #include "irradiancecache/bindin.glsl"
 #include "irradiancecache/bindout.glsl"
-
 #include "visitest/visitest.glsl"
 
 void main()
@@ -26,9 +23,9 @@ void main()
 		if (!irradianceCacheClearCache()) {
 			irradiance += readIrradianceCache(irrTexel).xyz;
 		}
-		irradiance += CollectDirectLight(origin, seed);
+		irradiance += collectDirectLight(origin, seed);
 	} else if (irradianceCacheMode() == MODE_DIRECT_ILLUMINATION) {
-		irradiance = CollectDirectLight(origin, seed);
+		irradiance = collectDirectLight(origin, seed);
 	} else if (irradianceCacheMode() == MODE_DEBUG_PATTERN) {
 		// no irradiance in tempImage
 		irradiance = vec3(0);

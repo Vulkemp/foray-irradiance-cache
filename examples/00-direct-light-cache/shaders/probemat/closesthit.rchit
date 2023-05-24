@@ -9,17 +9,15 @@
 #include "rt_common/geobuffers.glsl"// Vertex and index buffer aswell as accessor methods
 #include "common/normaltbn.glsl"// Normal calculation in tangent space
 #include "common/lcrng.glsl"
-#include "rt_common/tlas.glsl"// Binds Top Level Acceleration Structure
-#include "rt_common/simplifiedlights.glsl"
 #include "irradiancecache/bindin.glsl"
 #include "visitest/visitest.glsl"
 #include "shading/constants.glsl"
 #include "shading/sampling.glsl"
 #include "shading/material.glsl"
+#include "directlight.glsl"
 
-#define HITPAYLOAD_IN
-#define HITPAYLOAD_OUT
-#include "rt_common/payload.glsl"
+#define PROBEMATPAYLOAD_IN
+#include "payload.glsl"
 
 hitAttributeEXT vec2 attribs;// Barycentric coordinates
 
@@ -30,7 +28,7 @@ void CorrectOrigin(inout vec3 origin, vec3 normal, float nDotL)
 	origin += normal * correctorLength;
 }
 
-vec3 CollectDirectLight(in vec3 pos, in vec3 normal, in MaterialBufferObject material, in MaterialProbe probe)
+vec3 CollectLight(vec3 pos, vec3 normal, MaterialBufferObject material, MaterialProbe probe)
 {
 	// Irradiance Cache does not yet support incoming direction, so specular might look weird
 	vec3 dir = normal;
@@ -42,10 +40,16 @@ vec3 CollectDirectLight(in vec3 pos, in vec3 normal, in MaterialBufferObject mat
 	hit.wHalf = normalize(hit.wOut + hit.wIn);
 
 	// Calculate light reflected
-	vec3 irradianceCacheLight = sampleIrradianceCache(pos, normal).xyz;
-	vec3 reflection = irradianceCacheLight * EvaluateMaterial(hit, material, probe);
+	vec3 light = vec3(0);
+	if (ProbeMatInPayload.config.sampleIrradianceCache) {
+		light += sampleIrradianceCache(pos, normal).xyz;
+	}
+	if (ProbeMatInPayload.config.traceDirectLight) {
+		light += collectDirectLight(pos, ProbeMatInPayload.hit.Seed);
+	}
 
-	return reflection * ReturnPayload.Attenuation;
+	vec3 reflection = light * EvaluateMaterial(hit, material, probe);
+	return reflection * ProbeMatInPayload.hit.Attenuation;
 }
 
 void main()
@@ -91,8 +95,8 @@ void main()
 
 	normalWorldSpace = ApplyNormalMap(TBN, probe);
 
-	vec3 directLight = CollectDirectLight(posWorldSpace, normalWorldSpace, material, probe);
+	vec3 directLight = CollectLight(posWorldSpace, normalWorldSpace, material, probe);
 	float rayDist = length(posWorldSpace - gl_WorldRayOriginEXT);
-	ReturnPayload.Radiance = directLight + probe.EmissiveColor;
-	ReturnPayload.Distance = length(posWorldSpace - gl_WorldRayOriginEXT);
+	ProbeMatInPayload.hit.Radiance = directLight + probe.EmissiveColor;
+	ProbeMatInPayload.hit.Distance = length(posWorldSpace - gl_WorldRayOriginEXT);
 }

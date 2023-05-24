@@ -5,6 +5,7 @@
 #include "core/foray_samplercollection.hpp"
 #include "VisiTest.h"
 #include "IrradianceCache.h"
+#include "ProbeMat.h"
 
 namespace foray::irradiance_cache {
 
@@ -19,9 +20,7 @@ namespace foray::irradiance_cache {
     private:
         FinalRTStage &mStage;
         core::ShaderModule mRaygen;
-        core::ShaderModule mClosestHit;
-        core::ShaderModule mAnyHit;
-        core::ShaderModule mMiss;
+        std::optional<ProbeMat> mProbeMat;
         std::optional<VisiTest> mVisiTest;
     };
 

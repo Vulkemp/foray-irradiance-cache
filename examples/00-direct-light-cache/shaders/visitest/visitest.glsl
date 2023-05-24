@@ -4,7 +4,7 @@
 #define VISIPAYLOAD_OUT
 #include "payload.glsl"
 
-bool performVisiTest(vec3 origin, float Tmin, vec3 dir, float len) {
+bool performVisiTest(vec3 origin, float tmin, vec3 dir, float len) {
 	// Perform visibility test
 	VisiPayload.hit = true;
 
@@ -15,7 +15,7 @@ bool performVisiTest(vec3 origin, float Tmin, vec3 dir, float len) {
 		0,
 		VISITEST_GROUP_ID, // Miss Index (the visibility test miss shader)
 		origin, // Ray origin in world space
-		0.001, // Minimum ray travel distance
+		tmin, // Minimum ray travel distance
 		dir, // Ray direction in world space
 		len, // Maximum ray travel distance
 		2 // Payload index (outgoing payload bound to location 0 in payload.glsl)

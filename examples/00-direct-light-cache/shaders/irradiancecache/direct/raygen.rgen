@@ -13,7 +13,6 @@
 #include "irradiancecache/bindout.glsl"
 
 #include "visitest/visitest.glsl"
-const VisiTestConfig visiTestConfig = { 0, 0, 0 };
 
 void main()
 {
@@ -27,9 +26,9 @@ void main()
 		if (!irradianceCacheClearCache()) {
 			irradiance += readIrradianceCache(irrTexel).xyz;
 		}
-		irradiance += CollectDirectLight(visiTestConfig, origin, seed);
+		irradiance += CollectDirectLight(origin, seed);
 	} else if (irradianceCacheMode() == MODE_DIRECT_ILLUMINATION) {
-		irradiance = CollectDirectLight(visiTestConfig, origin, seed);
+		irradiance = CollectDirectLight(origin, seed);
 	} else if (irradianceCacheMode() == MODE_DEBUG_PATTERN) {
 		// no irradiance in tempImage
 		irradiance = vec3(0);

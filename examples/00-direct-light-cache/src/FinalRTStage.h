@@ -22,7 +22,7 @@ namespace foray::irradiance_cache {
         core::ShaderModule mClosestHit;
         core::ShaderModule mAnyHit;
         core::ShaderModule mMiss;
-        VisiTest mVisiTest;
+        std::optional<VisiTest> mVisiTest;
     };
 
     class FinalRTStage : public stages::DefaultRaytracingStageBase {

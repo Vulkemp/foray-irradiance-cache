@@ -7,9 +7,10 @@ namespace foray::irradiance_cache {
 
     struct VisiTest {
     public:
-        VisiTest() = default;
-        void Init(core::Context *context, std::vector<uint64_t> &shaderKeys, rtpipe::RtPipeline &pipeline, rtpipe::GroupIndex groupId);
+        VisiTest(core::Context *context, core::ShaderCompilerConfig &options, int groupId);
+        void Compile(core::Context *context, core::ShaderCompilerConfig &options, std::vector<uint64_t> &shaderKeys, rtpipe::RtPipeline &pipeline);
 
+        rtpipe::GroupIndex mGroupId;
         core::ShaderModule mVisiMiss;
         core::ShaderModule mVisiAnyHit;
     };

@@ -18,7 +18,7 @@ namespace foray::irradiance_cache {
     private:
         IrradianceCacheIndirectStage &mStage;
         core::ShaderModule mRaygen;
-        VisiTest mVisiTest;
+        std::optional<VisiTest> mVisiTest;
     };
 
     class IrradianceCacheIndirectStage : public stages::RaytracingStageBase {

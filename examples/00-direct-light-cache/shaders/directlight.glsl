@@ -4,7 +4,7 @@
 // Do a maximum of 5 light tests (since each is a ray cast, which is quite expensive)
 const uint DIRECT_LIGHT_TEST_CNT = 5;
 
-vec3 CollectDirectLight(const VisiTestConfig visiTestConfig, vec3 pos, uint seed)
+vec3 CollectDirectLight(vec3 pos, uint seed)
 {
 	const uint lightTestCount = min(DIRECT_LIGHT_TEST_CNT, SimplifiedLights.Count);
 
@@ -35,7 +35,7 @@ vec3 CollectDirectLight(const VisiTestConfig visiTestConfig, vec3 pos, uint seed
 		}
 
 		// If light source is visible ...
-		if (!performVisiTest(visiTestConfig, origin, 0.001, dir, len))
+		if (!performVisiTest(origin, 0.001, dir, len))
 		{
 			directLightSum += (light.Intensity * light.Color) / (4 * PI) * dropoffFactor;
 			directLightWeight += 1;

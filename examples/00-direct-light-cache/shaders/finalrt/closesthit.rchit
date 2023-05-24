@@ -12,13 +12,10 @@
 #include "rt_common/tlas.glsl"// Binds Top Level Acceleration Structure
 #include "rt_common/simplifiedlights.glsl"
 #include "irradiancecache/bindin.glsl"
-
+#include "visitest/visitest.glsl"
 #include "shading/constants.glsl"
 #include "shading/sampling.glsl"
 #include "shading/material.glsl"
-
-#include "../visitest/visitest.glsl"
-const VisiTestConfig visiTestConfig = { 1, 0, 1 };
 
 #define HITPAYLOAD_IN
 #define HITPAYLOAD_OUT

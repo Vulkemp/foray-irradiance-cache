@@ -15,11 +15,11 @@ namespace foray::irradiance_cache {
 
     IrradianceCacheDirectShaders::IrradianceCacheDirectShaders(IrradianceCacheDirectStage &s) : mStage(s) {
         foray::core::ShaderCompilerConfig options{.IncludeDirs = {FORAY_SHADER_DIR, EXAMPLE_SHADER_DIR}};
+        mVisiTest.emplace(s.mContext, options, 0);
+
         s.mShaderKeys.push_back(mRaygen.CompileFromSource(s.mContext, RAYGEN_FILE, options));
-
         s.mPipeline.GetRaygenSbt().SetGroup(0, &mRaygen);
-        mVisiTest.Init(s.mContext, s.mShaderKeys, s.mPipeline, 0);
-
+        mVisiTest->Compile(s.mContext, options, s.mShaderKeys, s.mPipeline);
         s.mPipeline.Build(s.mContext, s.mPipelineLayout);
     }
 

@@ -87,6 +87,7 @@ namespace foray::irradiance_cache {
         mSwapCopyStage.RecordFrame(cmdBuffer, renderInfo);
         renderInfo.GetInFlightFrame()->PrepareSwapchainImageForPresent(cmdBuffer, renderInfo.GetImageLayoutCache());
         cmdBuffer.Submit();
+        mIrradianceCache->frameFinished();
     }
 
     void IrradianceCacheApp::ApiDestroy() {

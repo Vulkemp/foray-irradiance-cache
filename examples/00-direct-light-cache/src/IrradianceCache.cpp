@@ -34,6 +34,11 @@ namespace foray::irradiance_cache {
         return VkExtent3D{probes.x, probes.y, probes.z};
     }
 
+    void IrradianceCache::frameFinished() {
+        // frame is done, so stop clearing cache
+        mClearCache = false;
+    }
+
     IrradianceCacheShaderAccess::IrradianceCacheShaderAccess(IrradianceCache &irradianceCache, util::PipelineLayout &pipelineLayout, VkShaderStageFlags stageFlags) :
             irradianceCache(irradianceCache),
             pipelineLayout(pipelineLayout),
@@ -51,6 +56,5 @@ namespace foray::irradiance_cache {
                 (uint32_t) renderInfo.GetFrameNumber()
         };
         vkCmdPushConstants(cmdBuffer, pipelineLayout, stageFlags, 0, sizeof(ps), &ps);
-        irradianceCache.mClearCache = false;
     }
 }

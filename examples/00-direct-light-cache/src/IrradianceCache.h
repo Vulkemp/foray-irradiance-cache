@@ -33,6 +33,8 @@ namespace foray::irradiance_cache {
         // @brief select an imageExtent so that probes are PROBE_DISTANCE always apart, may increase extent to match PROBE_DISTANCE
         static VkExtent3D calculateImageExtend(glm::vec3 &extent, glm::vec3 probeDistance);
 
+        void frameFinished();
+
         FORAY_GETTER_V(Origin);
 
         FORAY_GETTER_V(Extent);
@@ -65,7 +67,7 @@ namespace foray::irradiance_cache {
         glm::vec3 mOrigin;
         glm::vec3 mExtent;
         IrradianceCacheMode mMode = IrradianceCacheMode::DEFAULT;
-        bool mClearCache = false;
+        bool mClearCache = true;
 
         foray::core::Managed3dImage mIndirectImage;
         foray::core::Managed3dImage mTempImage;

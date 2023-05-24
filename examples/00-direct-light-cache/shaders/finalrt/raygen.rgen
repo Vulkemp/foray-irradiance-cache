@@ -3,8 +3,8 @@
 #extension GL_EXT_ray_tracing : enable // Raytracing
 
 #include "bindpoints.glsl"
-#include "common/camera.glsl" // Binds camera matrices UBO
-#include "rt_common/imageoutput.glsl" // Binds the output storage image
+#include "common/camera.glsl"
+#include "rt_common/imageoutput.glsl"
 #include "irradiancecache/irradiancecache.glsl"
 #include "common/xteanoise.glsl"
 #include "shading/constants.glsl"
@@ -13,28 +13,37 @@
 void main()
 {
 	// We calculate the ray vector using the current pixels UV coords and the inverse view and projection matrices
-	const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5); // offset from the corner of the pixel to the center
-	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy); // UV coordinate of the current pixel in the framebuffer texture
-	vec2 d = inUV * 2.0 - 1.0; // Correct for depth information
+	const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);// offset from the corner of the pixel to the center
+	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);// UV coordinate of the current pixel in the framebuffer texture
+	vec2 d = inUV * 2.0 - 1.0;// Correct for depth information
 
-	vec4 origin = Camera.InverseViewMatrix * vec4(0,0,0,1); // Ray origin in world space
-	vec4 direction = Camera.InverseViewMatrix * Camera.InverseProjectionMatrix * vec4(d.x, d.y, 1, 1); // Target direction in world space
+	vec4 origin = Camera.InverseViewMatrix * vec4(0, 0, 0, 1);// Ray origin in world space
+	vec4 direction = Camera.InverseViewMatrix * Camera.InverseProjectionMatrix * vec4(d.x, d.y, 1, 1);// Target direction in world space
 
 
 	ProbeMatTraceConfig probeMatConfig;
-	if (irradianceCacheMode() == MODE_INDIRECT_ILLUMINATION) {
+	uint mode = irradianceCacheMode();
+	if (mode == MODE_INDIRECT_TRACE_DIRECT_TRACE) {
+		probeMatConfig.sampleIrradianceCache = false;
+		probeMatConfig.traceDirectLight = true;
+		probeMatConfig.traceIndirectLight = true;
+	} else if (mode == MODE_INDIRECT_IC_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = true;
-	} else if (irradianceCacheMode() == MODE_DIRECT_ILLUMINATION) {
+		probeMatConfig.traceIndirectLight = false;
+	} else if (mode == MODE_INDIRECT_IC || mode == MODE_DIRECT_IC || mode == MODE_DEBUG_PATTERN) {
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = false;
-	} else if (irradianceCacheMode() == MODE_DEBUG_PATTERN) {
-		probeMatConfig.sampleIrradianceCache = true;
-		probeMatConfig.traceDirectLight = false;
+		probeMatConfig.traceIndirectLight = false;
+	} else if (mode == MODE_DIRECT_TRACE) {
+		probeMatConfig.sampleIrradianceCache = false;
+		probeMatConfig.traceDirectLight = true;
+		probeMatConfig.traceIndirectLight = false;
 	} else {
 		// not implemented! -> specific recognizable color
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = false;
+		probeMatConfig.traceIndirectLight = false;
 	}
 
 	uint seed = CalculateSeedXTEA(ivec2(gl_LaunchIDEXT.xy), TracerConfig.RngSeed);

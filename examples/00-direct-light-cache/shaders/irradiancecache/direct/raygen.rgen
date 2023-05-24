@@ -18,19 +18,20 @@ void main()
 	uint seed = CalculateSeedXTEA(irrTexel, TracerConfig.RngSeed);
 
 	vec3 irradiance;
-	if (irradianceCacheMode() == MODE_INDIRECT_ILLUMINATION) {
+	uint mode = irradianceCacheMode();
+	if (mode == MODE_INDIRECT_TRACE_DIRECT_TRACE || mode == MODE_DIRECT_TRACE || mode == MODE_DEBUG_PATTERN) {
+		// ic unused
+		irradiance = vec3(0);
+	} else if (mode == MODE_INDIRECT_IC_DIRECT_TRACE || mode == MODE_INDIRECT_IC) {
 		irradiance = vec3(0);
 		if (!irradianceCacheClearCache()) {
 			irradiance += readIrradianceCache(irrTexel).xyz;
 		}
 		irradiance += collectDirectLight(origin, seed);
-	} else if (irradianceCacheMode() == MODE_DIRECT_ILLUMINATION) {
+	} else if (mode == MODE_DIRECT_IC) {
 		irradiance = collectDirectLight(origin, seed);
-	} else if (irradianceCacheMode() == MODE_DEBUG_PATTERN) {
-		// no irradiance in tempImage
-		irradiance = vec3(0);
 	} else {
-		// not implemented! -> specific recognizable color
+		// not implemented! -> specific recognizable color with NaNs
 		irradiance = vec3(1, 0.5, 0/0);
 	}
 	writeIrradianceCache(irrTexel, vec4(irradiance, 0.0));

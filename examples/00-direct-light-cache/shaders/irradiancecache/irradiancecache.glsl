@@ -8,9 +8,12 @@
 #endif
 #define PUSH_CONSTANTS_DEFINED
 
-const uint MODE_INDIRECT_ILLUMINATION = 0;
-const uint MODE_DIRECT_ILLUMINATION = 1;
-const uint MODE_DEBUG_PATTERN = 2;
+const uint MODE_INDIRECT_TRACE_DIRECT_TRACE = 0;
+const uint MODE_INDIRECT_IC_DIRECT_TRACE = 1;
+const uint MODE_INDIRECT_IC = 2;
+const uint MODE_DIRECT_TRACE = 3;
+const uint MODE_DIRECT_IC = 4;
+const uint MODE_DEBUG_PATTERN = 5;
 
 struct IrradianceCacheConfig {
 // w unused

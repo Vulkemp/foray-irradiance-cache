@@ -24,11 +24,15 @@ void main()
 	uint seed = CalculateSeedXTEA(irrTexel, TracerConfig.RngSeed);
 
 	vec3 irradiance;
-	if (irradianceCacheMode() == MODE_INDIRECT_ILLUMINATION) {
+	uint mode = irradianceCacheMode();
+	if (mode == MODE_INDIRECT_TRACE_DIRECT_TRACE || mode == MODE_DIRECT_TRACE) {
+		// ic unused
+		irradiance = vec3(0);
+	} else if (mode == MODE_INDIRECT_IC_DIRECT_TRACE || mode == MODE_INDIRECT_IC) {
 		irradiance = TraceForNeighbours(origin, seed);
-	} else if (irradianceCacheMode() == MODE_DIRECT_ILLUMINATION) {
+	} else if (mode == MODE_DIRECT_IC) {
 		irradiance = readIrradianceCache(irrTexel).xyz;
-	} else if (irradianceCacheMode() == MODE_DEBUG_PATTERN) {
+	} else if (mode == MODE_DEBUG_PATTERN) {
 		const uint levels = 10;
 		irradiance = vec3(float((irrTexel.x + irrTexel.y + irrTexel.z) % levels) / levels);
 	} else {

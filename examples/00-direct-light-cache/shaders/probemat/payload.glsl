@@ -7,6 +7,7 @@
 struct ProbeMatTraceConfig {
 	bool sampleIrradianceCache;
 	bool traceDirectLight;
+	bool traceIndirectLight;
 };
 
 struct ProbeMatPayload

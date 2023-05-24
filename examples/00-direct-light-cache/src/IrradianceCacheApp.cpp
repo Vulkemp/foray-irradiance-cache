@@ -51,6 +51,25 @@ namespace foray::irradiance_cache {
     void IrradianceCacheApp::ApiOnEvent(const osi::Event *event) {
         mScene->InvokeOnEvent(event);
         DefaultAppBase::ApiOnEvent(event);
+
+        if (event->Type == osi::Event::EType::InputBinary) {
+            auto *e = reinterpret_cast<const osi::EventInputBinary *>(event);
+            if (e->State) {
+                auto mode = (int32_t) mIrradianceCache->GetMode();
+                if (e->SourceInput->GetButtonId() == foray::osi::EButton::Keyboard_T) {
+                    mode--;
+                } else if (e->SourceInput->GetButtonId() == foray::osi::EButton::Keyboard_G) {
+                    mode++;
+                }
+
+                if (mode < 0) {
+                    mode = (int32_t) IrradianceCacheMode::MAX_ENUM - 1;
+                } else if (mode > (int32_t) IrradianceCacheMode::MAX_ENUM - 1) {
+                    mode = 0;
+                }
+                mIrradianceCache->SetMode((IrradianceCacheMode) mode);
+            }
+        }
     }
 
     void IrradianceCacheApp::ApiRender(base::FrameRenderInfo &renderInfo) {

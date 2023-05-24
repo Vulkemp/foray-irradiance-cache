@@ -68,6 +68,10 @@ namespace foray::irradiance_cache {
                     mode = 0;
                 }
                 mIrradianceCache->SetMode((IrradianceCacheMode) mode);
+
+                if (e->SourceInput->GetButtonId() == foray::osi::EButton::Keyboard_C) {
+                    mIrradianceCache->clearCache();
+                }
             }
         }
     }

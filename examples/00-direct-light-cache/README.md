@@ -11,6 +11,7 @@ ic: Irradiance Cache
   * DIRECT_TRACE: only direct raytrace, part #2 of default
   * DIRECT_IC: direct illumination though ic
   * DEBUG_PATTERN: a debug pattern repeating every 10 probes
+* C: clear irradiance cache, also happens when switching modes
 
 ## Code
 The type [IrradianceCache](src/IrradianceCache.h) manages all the resources required for the Irradiance Cache.

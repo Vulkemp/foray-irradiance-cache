@@ -13,8 +13,8 @@
 #include "probemat/probemat.glsl"
 #include "visitest/visitest.glsl"
 
-const uint TRACES_PER_FRAME = 16;
-const float ACCUMULATION_FACTOR_PER_FRAME = 0.8f;
+const uint TRACES_PER_FRAME = 64;
+const float ACCUMULATION_FACTOR_PER_FRAME = 0.95f;
 
 vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 {

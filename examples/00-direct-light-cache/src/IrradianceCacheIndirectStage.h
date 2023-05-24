@@ -4,6 +4,7 @@
 #include "IrradianceCache.h"
 #include "VisiTest.h"
 #include "scene/globalcomponents/foray_lightmanager.hpp"
+#include "ProbeMat.h"
 
 namespace foray::irradiance_cache {
 
@@ -18,6 +19,7 @@ namespace foray::irradiance_cache {
     private:
         IrradianceCacheIndirectStage &mStage;
         core::ShaderModule mRaygen;
+        std::optional<ProbeMat> mProbeMat;
         std::optional<VisiTest> mVisiTest;
     };
 

@@ -6,21 +6,43 @@
 #include "common/camera.glsl"
 #include "common/xteanoise.glsl"
 #include "shading/constants.glsl"
+#include "shading/sampling.glsl"
 #include "directlight.glsl"
 #include "irradiancecache/bindin.glsl"
 #include "irradiancecache/bindout.glsl"
+#include "probemat/probemat.glsl"
 #include "visitest/visitest.glsl"
 
-vec3 TraceForNeighbours(vec3 origin, uint seed)
+const uint TRACES_PER_FRAME = 4;
+const float ACCUMULATION_FACTOR_PER_FRAME = 0.95f;
+
+vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 {
-	// TODO
-	return vec3(0, 0.5, 1);
+	vec3 origin = transformIrradiancePixelToWorld(irrTexel);
+	vec3 prev = readIrradianceCache(irrTexel).xyz;
+
+	vec3 probeMat = vec3(0);
+	for (uint i = 0; i < TRACES_PER_FRAME; i++) {
+		vec3 dir = sampleHemiSphere(seed);
+		// have a hemisphere + a 50% chance to flip it = full sphere
+		if (lcgFloat(seed) < 0.5) {
+			dir = -dir;
+		}
+
+		ProbeMatTraceConfig config;
+		config.sampleIrradianceCache = true;
+		config.traceDirectLight = false;
+		config.traceIndirectLight = false;
+		probeMat += performProbeMat(origin, 0.001, dir, INFINITY, config, seed);
+	}
+	probeMat /= TRACES_PER_FRAME;
+
+	return mix(probeMat, prev, ACCUMULATION_FACTOR_PER_FRAME);
 }
 
 void main()
 {
 	const uvec3 irrTexel = gl_LaunchIDEXT.xyz;
-	const vec3 origin = transformIrradiancePixelToWorld(irrTexel);
 	uint seed = CalculateSeedXTEA(irrTexel, TracerConfig.RngSeed);
 
 	vec3 irradiance;
@@ -29,7 +51,7 @@ void main()
 		// ic unused
 		irradiance = vec3(0);
 	} else if (mode == MODE_INDIRECT_IC_DIRECT_TRACE || mode == MODE_INDIRECT_IC) {
-		irradiance = TraceForNeighbours(origin, seed);
+		irradiance = traceForNeighbours(irrTexel, seed);
 	} else if (mode == MODE_DIRECT_IC) {
 		irradiance = readIrradianceCache(irrTexel).xyz;
 	} else if (mode == MODE_DEBUG_PATTERN) {

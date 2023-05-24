@@ -37,6 +37,9 @@ vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 	}
 	probeMat /= TRACES_PER_FRAME;
 
+	if (isnan(probeMat.x) || isnan(probeMat.y) || isnan(probeMat.z)) {
+		return prev;
+	}
 	return mix(probeMat, prev, ACCUMULATION_FACTOR_PER_FRAME);
 }
 

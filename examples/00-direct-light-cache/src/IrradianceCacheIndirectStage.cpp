@@ -86,7 +86,7 @@ namespace foray::irradiance_cache {
                 .SrcStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
                 .SrcAccessMask = VK_ACCESS_2_MEMORY_READ_BIT,
                 .DstStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
-                .DstAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT,
+                .DstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT,
                 .NewLayout     = VkImageLayout::VK_IMAGE_LAYOUT_GENERAL
         }));
     }

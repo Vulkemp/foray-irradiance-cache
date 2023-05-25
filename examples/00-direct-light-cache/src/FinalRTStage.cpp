@@ -63,7 +63,7 @@ namespace foray::irradiance_cache {
 
         imageFullBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetIndirectImage(), core::ImageLayoutCache::Barrier2{
                 .SrcStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
-                .SrcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT,
+                .SrcAccessMask = VK_ACCESS_2_MEMORY_READ_BIT | VK_ACCESS_2_MEMORY_WRITE_BIT,
                 .DstStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
                 .DstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT,
                 .NewLayout     = VkImageLayout::VK_IMAGE_LAYOUT_GENERAL

@@ -97,6 +97,17 @@ void main()
 
 	vec3 directLight = CollectLight(posWorldSpace, normalWorldSpace, material, probe);
 	float rayDist = length(posWorldSpace - gl_WorldRayOriginEXT);
-	ProbeMatInPayload.hit.Radiance = directLight + probe.EmissiveColor;
 	ProbeMatInPayload.hit.Distance = length(posWorldSpace - gl_WorldRayOriginEXT);
+
+	vec3 vtxWorld[3];
+	vtxWorld[0] = (gl_ObjectToWorldEXT * vec4(v0.Pos, 1.f)).xyz;
+	vtxWorld[1] = (gl_ObjectToWorldEXT * vec4(v1.Pos, 1.f)).xyz;
+	vtxWorld[2] = (gl_ObjectToWorldEXT * vec4(v2.Pos, 1.f)).xyz;
+
+	vec3 faceDir = cross(vtxWorld[0] - vtxWorld[1], vtxWorld[2] - vtxWorld[1]);
+	if(dot(faceDir, gl_WorldRayDirectionEXT) > 0) {
+		ProbeMatInPayload.hit.Radiance = directLight + probe.EmissiveColor;
+	} else {
+		ProbeMatInPayload.hit.Radiance = vec3(0);
+	}
 }

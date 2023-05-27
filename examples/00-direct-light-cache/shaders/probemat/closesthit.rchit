@@ -1,12 +1,12 @@
 #version 460
 #extension GL_GOOGLE_include_directive : enable // Include files
 #extension GL_EXT_ray_tracing : enable // Raytracing
-#extension GL_EXT_nonuniform_qualifier : enable // Required for asserting that some array indexing is done with non-uniform indices
+#extension GL_EXT_nonuniform_qualifier : enable
 
 #include "bindpoints.glsl"
-#include "common/materialbuffer.glsl"// Material buffer for material information and texture array
 #include "rt_common/geometrymetabuffer.glsl"// GeometryMeta information
 #include "rt_common/geobuffers.glsl"// Vertex and index buffer aswell as accessor methods
+#include "directlight.glsl"
 #include "common/normaltbn.glsl"// Normal calculation in tangent space
 #include "common/lcrng.glsl"
 #include "irradiancecache/bindin.glsl"
@@ -14,7 +14,6 @@
 #include "shading/constants.glsl"
 #include "shading/sampling.glsl"
 #include "shading/material.glsl"
-#include "directlight.glsl"
 
 #define PROBEMATPAYLOAD_IN
 #include "payload.glsl"
@@ -30,25 +29,22 @@ void CorrectOrigin(inout vec3 origin, vec3 normal, float nDotL)
 
 vec3 CollectLight(vec3 pos, vec3 normal, MaterialBufferObject material, MaterialProbe probe)
 {
-	// Irradiance Cache does not yet support incoming direction, so specular might look weird
-	vec3 dir = normal;
-
-	HitSample hit;
-	hit.Normal = normal;
-	hit.wOut = -gl_WorldRayDirectionEXT;
-	hit.wIn = dir;
-	hit.wHalf = normalize(hit.wOut + hit.wIn);
-
-	// Calculate light reflected
-	vec3 light = vec3(0);
+	vec3 reflection = vec3(0);
 	if (ProbeMatInPayload.config.sampleIrradianceCache) {
-		light += sampleIrradianceCache(pos, normal).xyz;
-	}
-	if (ProbeMatInPayload.config.traceDirectLight) {
-		light += collectDirectLight(pos, ProbeMatInPayload.hit.Seed);
+		// Irradiance Cache does not yet support incoming direction, so specular might look weird
+		vec3 dir = normal;
+
+		HitSample hit;
+		hit.Normal = normal;
+		hit.wOut = -gl_WorldRayDirectionEXT;
+		hit.wIn = dir;
+		hit.wHalf = normalize(hit.wOut + hit.wIn);
+		reflection += sampleIrradianceCache(pos, normal).xyz * EvaluateMaterial(hit, material, probe);
 	}
 
-	vec3 reflection = light * EvaluateMaterial(hit, material, probe);
+	if (ProbeMatInPayload.config.traceDirectLight) {
+		reflection += collectDirectLightAndMaterial(pos, normal, -gl_WorldRayDirectionEXT, material, probe, ProbeMatInPayload.hit.Seed);
+	}
 	return reflection * ProbeMatInPayload.hit.Attenuation;
 }
 
@@ -105,7 +101,7 @@ void main()
 	vtxWorld[2] = (gl_ObjectToWorldEXT * vec4(v2.Pos, 1.f)).xyz;
 
 	vec3 faceDir = cross(vtxWorld[0] - vtxWorld[1], vtxWorld[2] - vtxWorld[1]);
-	if(dot(faceDir, gl_WorldRayDirectionEXT) > 0) {
+	if (dot(faceDir, gl_WorldRayDirectionEXT) > 0) {
 		ProbeMatInPayload.hit.Radiance = directLight + probe.EmissiveColor;
 	} else {
 		ProbeMatInPayload.hit.Radiance = vec3(0);

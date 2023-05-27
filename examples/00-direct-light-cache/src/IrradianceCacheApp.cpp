@@ -5,9 +5,13 @@
 namespace foray::irradiance_cache {
 
     const std::string SCENE_FILE = DATA_DIR "/gltf/CornellBoxPointLight/CornellBoxPointLight.gltf";
+    const glm::vec3 PROBE_DISTANCE(0.05);
+
+//    const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/scene.gltf";
+//    const glm::vec3 PROBE_DISTANCE(0.2);
+
     /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
     constexpr bool INVERT_BLIT_INSTEAD = true;
-    const glm::vec3 PROBE_DISTANCE(0.05);
 
     void IrradianceCacheApp::ApiInit() {
         mScene = std::make_unique<scene::Scene>(&mContext);

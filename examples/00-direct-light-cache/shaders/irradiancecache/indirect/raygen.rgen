@@ -14,8 +14,16 @@
 #include "probemat/probemat.glsl"
 #include "visitest/visitest.glsl"
 
-const uint TRACES_PER_FRAME = 64;
-const float ACCUMULATION_FACTOR_PER_FRAME = 0.95f;
+//const uint TRACES_PER_FRAME = 16;
+//const float ACCUMULATION_FACTOR_PER_FRAME = 0.9975f;
+const uint TRACES_PER_FRAME = 32;
+const float ACCUMULATION_FACTOR_PER_FRAME = 0.995f;
+//const uint TRACES_PER_FRAME = 64;
+//const float ACCUMULATION_FACTOR_PER_FRAME = 0.99f;
+//const uint TRACES_PER_FRAME = 128;
+//const float ACCUMULATION_FACTOR_PER_FRAME = 0.98f;
+//const uint TRACES_PER_FRAME = 256;
+//const float ACCUMULATION_FACTOR_PER_FRAME = 0.96f;
 
 vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 {
@@ -44,7 +52,8 @@ vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 	if (isnan(probeMat.x) || isnan(probeMat.y) || isnan(probeMat.z)) {
 		return prev;
 	}
-	return mix(probeMat, prev, ACCUMULATION_FACTOR_PER_FRAME);
+	float accumFactor = irradianceCacheClearCache() ? 0 : ACCUMULATION_FACTOR_PER_FRAME;
+	return mix(probeMat, prev, accumFactor);
 }
 
 void main()

@@ -25,6 +25,7 @@ namespace foray::irradiance_cache {
     private:
         std::unique_ptr<foray::scene::Scene> mScene;
         std::optional<IrradianceCache> mIrradianceCache;
+        bool allowSkipIC = true;
 
         // stages
         std::optional<FinalRTStage> mRtStage;

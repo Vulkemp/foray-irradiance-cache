@@ -91,8 +91,12 @@ namespace foray::irradiance_cache {
         cmdBuffer.Begin();
         renderInfo.GetInFlightFrame()->ClearSwapchainImage(cmdBuffer, renderInfo.GetImageLayoutCache());
         mScene->Update(renderInfo, cmdBuffer);
-        mIrradianceCacheDirectStage->RecordFrame(cmdBuffer, renderInfo);
-        mIrradianceCacheIndirectStage->RecordFrame(cmdBuffer, renderInfo);
+
+        if (!(allowSkipIC && skipIC(mIrradianceCache->GetMode()))) {
+            mIrradianceCacheDirectStage->RecordFrame(cmdBuffer, renderInfo);
+            mIrradianceCacheIndirectStage->RecordFrame(cmdBuffer, renderInfo);
+        }
+
         mRtStage->RecordFrame(cmdBuffer, renderInfo);
         mSwapCopyStage.RecordFrame(cmdBuffer, renderInfo);
         mImguiStage.RecordFrame(cmdBuffer, renderInfo);
@@ -121,6 +125,8 @@ namespace foray::irradiance_cache {
         if (ImGui::Button("Clear Irradiance Cache")) {
             mIrradianceCache->clearCache();
         }
+
+        ImGui::Checkbox("Allow skip IC", &allowSkipIC);
 
         ImGui::End();
     }

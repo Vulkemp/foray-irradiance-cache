@@ -7,7 +7,7 @@
 struct ProbeMatTraceConfig {
 	bool sampleIrradianceCache;
 	bool traceDirectLight;
-	bool traceIndirectLight;
+	uint traceIndirectLightDepth;
 };
 
 struct ProbeMatPayload
@@ -16,18 +16,13 @@ struct ProbeMatPayload
 	ProbeMatTraceConfig config;
 };
 
-ProbeMatPayload constructProbeMatPayload(ProbeMatTraceConfig config, uint seed)
-{
-	ProbeMatPayload probe = { ConstructHitPayload(), config };
-	probe.hit.Seed = seed;
-	return probe;
-}
+#endif
 
 #ifdef PROBEMATPAYLOAD_OUT
 layout(location = 4) rayPayloadEXT ProbeMatPayload ProbeMatOutPayload;
+#undef PROBEMATPAYLOAD_OUT
 #endif
 #ifdef PROBEMATPAYLOAD_IN
 layout(location = 5) rayPayloadInEXT ProbeMatPayload ProbeMatInPayload;
-#endif
-
+#undef PROBEMATPAYLOAD_IN
 #endif

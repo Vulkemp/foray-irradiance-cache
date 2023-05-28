@@ -36,7 +36,7 @@ vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 		ProbeMatTraceConfig config;
 		config.sampleIrradianceCache = true;
 		config.traceDirectLight = false;
-		config.traceIndirectLight = false;
+		config.traceIndirectLightDepth = 0;
 		probeMat += performProbeMat(origin, 0.001, dir, INFINITY, config, seed);
 	}
 	probeMat /= TRACES_PER_FRAME;

@@ -70,8 +70,8 @@ vec3 collectDirectLight(vec3 pos, inout uint seed) {
 	return collectDirectLightBase(pos, false, vec3(0), vec3(0), material, probe, seed);
 }
 
-vec3 collectDirectLightAndMaterial(vec3 pos, vec3 normal, vec3 wOut, MaterialBufferObject material, MaterialProbe probe, inout uint seed) {
-	return collectDirectLightBase(pos, true, normal, wOut, material, probe, seed);
+vec3 collectDirectLightAndMaterial(vec3 pos, vec3 normal, vec3 wOut, MaterialBufferObject material, MaterialProbe probe, vec3 attenuation, inout uint seed) {
+	return collectDirectLightBase(pos, true, normal, wOut, material, probe, seed) * attenuation;
 }
 
 #endif

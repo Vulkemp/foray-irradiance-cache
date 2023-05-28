@@ -27,24 +27,24 @@ void main()
 	if (mode == MODE_INDIRECT_TRACE_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = false;
 		probeMatConfig.traceDirectLight = true;
-		probeMatConfig.traceIndirectLight = true;
+		probeMatConfig.traceIndirectLightDepth = 5;
 	} else if (mode == MODE_INDIRECT_IC_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = true;
-		probeMatConfig.traceIndirectLight = false;
+		probeMatConfig.traceIndirectLightDepth = 0;
 	} else if (mode == MODE_INDIRECT_IC || mode == MODE_DIRECT_IC || mode == MODE_DEBUG_PATTERN) {
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = false;
-		probeMatConfig.traceIndirectLight = false;
+		probeMatConfig.traceIndirectLightDepth = 0;
 	} else if (mode == MODE_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = false;
 		probeMatConfig.traceDirectLight = true;
-		probeMatConfig.traceIndirectLight = false;
+		probeMatConfig.traceIndirectLightDepth = 0;
 	} else {
 		// not implemented! -> specific recognizable color
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = false;
-		probeMatConfig.traceIndirectLight = false;
+		probeMatConfig.traceIndirectLightDepth = 0;
 	}
 
 	uint seed = CalculateSeedXTEA(ivec2(gl_LaunchIDEXT.xy), TracerConfig.RngSeed);

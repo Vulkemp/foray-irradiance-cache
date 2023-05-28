@@ -6,7 +6,13 @@
 #include "bindpoints.glsl"
 #include "rt_common/geometrymetabuffer.glsl"// GeometryMeta information
 #include "rt_common/geobuffers.glsl"// Vertex and index buffer aswell as accessor methods
+
 #include "directlight.glsl"
+// don't bind materials again...
+#undef BIND_MATERIAL_BUFFER
+#undef BIND_TEXTURES_ARRAY
+#include "indirectlight.glsl"
+
 #include "common/normaltbn.glsl"// Normal calculation in tangent space
 #include "common/lcrng.glsl"
 #include "irradiancecache/bindin.glsl"
@@ -20,16 +26,10 @@
 
 hitAttributeEXT vec2 attribs;// Barycentric coordinates
 
-// Offsets a ray origin slightly away from the surface to prevent self shadowing
-void CorrectOrigin(inout vec3 origin, vec3 normal, float nDotL)
-{
-	float correctorLength = clamp((1.0 - nDotL) * 0.005, 0, 1);
-	origin += normal * correctorLength;
-}
-
 vec3 CollectLight(vec3 pos, vec3 normal, MaterialBufferObject material, MaterialProbe probe)
 {
 	vec3 reflection = vec3(0);
+	vec3 attenuation = ProbeMatInPayload.hit.Attenuation;
 	if (ProbeMatInPayload.config.sampleIrradianceCache) {
 		// Irradiance Cache does not yet support incoming direction, so specular might look weird
 		vec3 dir = normal;
@@ -39,13 +39,17 @@ vec3 CollectLight(vec3 pos, vec3 normal, MaterialBufferObject material, Material
 		hit.wOut = -gl_WorldRayDirectionEXT;
 		hit.wIn = dir;
 		hit.wHalf = normalize(hit.wOut + hit.wIn);
-		reflection += sampleIrradianceCache(pos, normal).xyz * EvaluateMaterial(hit, material, probe);
+		reflection += sampleIrradianceCache(pos, normal).xyz * EvaluateMaterial(hit, material, probe) * attenuation;
 	}
 
+	vec3 wOut = normalize(-gl_WorldRayDirectionEXT);
 	if (ProbeMatInPayload.config.traceDirectLight) {
-		reflection += collectDirectLightAndMaterial(pos, normal, -gl_WorldRayDirectionEXT, material, probe, ProbeMatInPayload.hit.Seed);
+		reflection += collectDirectLightAndMaterial(pos, normal, wOut, material, probe, attenuation, ProbeMatInPayload.hit.Seed);
 	}
-	return reflection * ProbeMatInPayload.hit.Attenuation;
+	if (ProbeMatInPayload.config.traceIndirectLightDepth > 0) {
+		reflection += collectIndirectLightAndMaterial(pos, normal, wOut, material, probe, attenuation, ProbeMatInPayload.hit.Seed, ProbeMatInPayload.config);
+	}
+	return reflection;
 }
 
 void main()

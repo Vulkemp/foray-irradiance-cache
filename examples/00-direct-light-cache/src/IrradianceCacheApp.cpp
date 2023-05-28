@@ -104,8 +104,24 @@ namespace foray::irradiance_cache {
     void IrradianceCacheApp::ImGui() {
         ImGui::Begin("window");
         foray::base::RenderLoop::FrameTimeAnalysis analysis = mRenderLoop.AnalyseFrameTimes();
-        ImGui::Text("Mode: %s", MODE_NAMES[(size_t) mIrradianceCache->GetMode()]);
         ImGui::Text("FPS: %f avg %f min", analysis.Count > 0 ? 1.f / analysis.AvgFrameTime : 0, analysis.Count > 0 ? 1.f / analysis.MaxFrameTime : 0);
+
+        std::string modeName(NAMEOF_ENUM(mIrradianceCache->GetMode()));
+        if (ImGui::BeginCombo("Mode", modeName.c_str())) {
+            for (uint32_t i = 0; i < (uint32_t) IrradianceCacheMode::MAX_ENUM; i++) {
+                auto mode = (IrradianceCacheMode) i;
+                modeName = std::string(NAMEOF_ENUM(mode));
+                if (ImGui::MenuItem(modeName.c_str())) {
+                    mIrradianceCache->SetMode(mode);
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::Button("Clear Irradiance Cache")) {
+            mIrradianceCache->clearCache();
+        }
+
         ImGui::End();
     }
 

@@ -59,7 +59,7 @@ namespace foray::irradiance_cache {
         }
 
         inline void clearCache() {
-            mClearCache = true;
+            mClearCacheQueued = true;
         }
 
     private:
@@ -67,6 +67,7 @@ namespace foray::irradiance_cache {
         glm::vec3 mOrigin;
         glm::vec3 mExtent;
         IrradianceCacheMode mMode = IrradianceCacheMode::DEFAULT;
+        bool mClearCacheQueued = false;
         bool mClearCache = true;
 
         foray::core::Managed3dImage mIndirectImage;

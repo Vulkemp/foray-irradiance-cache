@@ -35,8 +35,10 @@ namespace foray::irradiance_cache {
     }
 
     void IrradianceCache::frameFinished() {
-        // frame is done, so stop clearing cache
-        mClearCache = false;
+        // frame is done, stop clearing cache
+        // requires a queue so clearing cache from ImGui doesn't get cleared immediately
+        mClearCache = mClearCacheQueued;
+        mClearCacheQueued = false;
     }
 
     IrradianceCacheShaderAccess::IrradianceCacheShaderAccess(IrradianceCache &irradianceCache, util::PipelineLayout &pipelineLayout, VkShaderStageFlags stageFlags) :

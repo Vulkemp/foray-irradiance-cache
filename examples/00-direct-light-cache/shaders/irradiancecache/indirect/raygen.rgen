@@ -14,17 +14,6 @@
 #include "probemat/probemat.glsl"
 #include "visitest/visitest.glsl"
 
-//const uint TRACES_PER_FRAME = 16;
-//const float ACCUMULATION_FACTOR_PER_FRAME = 0.9975f;
-const uint TRACES_PER_FRAME = 32;
-const float ACCUMULATION_FACTOR_PER_FRAME = 0.995f;
-//const uint TRACES_PER_FRAME = 64;
-//const float ACCUMULATION_FACTOR_PER_FRAME = 0.99f;
-//const uint TRACES_PER_FRAME = 128;
-//const float ACCUMULATION_FACTOR_PER_FRAME = 0.98f;
-//const uint TRACES_PER_FRAME = 256;
-//const float ACCUMULATION_FACTOR_PER_FRAME = 0.96f;
-
 vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 {
 	vec3 origin = transformIrradiancePixelToWorld(irrTexel);
@@ -33,8 +22,9 @@ vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 		prev = readOutIrradianceCache(irrTexel).xyz;
 	}
 
+	uint tracesPerFrame = irradianceCacheIndirectTracesPerFrame();
 	vec3 probeMat = vec3(0);
-	for (uint i = 0; i < TRACES_PER_FRAME; i++) {
+	for (uint i = 0; i < tracesPerFrame; i++) {
 		vec3 dir = sampleHemiSphere(seed);
 		// have a hemisphere + a 50% chance to flip it = full sphere
 		if (lcgFloat(seed) < 0.5) {
@@ -47,13 +37,15 @@ vec3 traceForNeighbours(uvec3 irrTexel, inout uint seed)
 		config.traceIndirectLightDepth = 0;
 		probeMat += performProbeMat(origin, 0.001, dir, INFINITY, config, seed);
 	}
-	probeMat /= TRACES_PER_FRAME;
+	probeMat /= tracesPerFrame;
 
+	// this is a giant hack: once one NaN is written other probes will read and further
+	// propagate it forever resulting in a black image that only a clear can fix
+	// the source of NaNs has not yet been investigated
 	if (isnan(probeMat.x) || isnan(probeMat.y) || isnan(probeMat.z)) {
 		return prev;
 	}
-	float accumFactor = irradianceCacheClearCache() ? 0 : ACCUMULATION_FACTOR_PER_FRAME;
-	return mix(probeMat, prev, accumFactor);
+	return mix(prev, probeMat, irradianceCacheIndirectAccumulationFactor());
 }
 
 void main()

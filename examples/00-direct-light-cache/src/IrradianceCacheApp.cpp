@@ -126,6 +126,17 @@ namespace foray::irradiance_cache {
             mIrradianceCache->clearCache();
         }
 
+        int tracesPerFrame = (int) mIrradianceCache->GetTracesPerFrame();
+        ImGui::SliderInt("Traces per frame", &tracesPerFrame, 1, 256, "%u", ImGuiSliderFlags_Logarithmic);
+        mIrradianceCache->SetTracesPerFrame(tracesPerFrame > 1 ? (uint32_t) tracesPerFrame : 1);
+
+        float optimalAccumFactor = IrradianceCache::optimalAccumulationRateForTraces(tracesPerFrame);
+        ImGui::SliderFloat("Accumulation Quality", &accumQuality, 1.f / 64.f, 4, "%.4f", ImGuiSliderFlags_Logarithmic);
+        float accumFactor = optimalAccumFactor / accumQuality;
+        ImGui::SliderFloat("Accumulation Factor", &accumFactor, 0, 0.5, "%.4f");
+        accumQuality = optimalAccumFactor / accumFactor;
+        mIrradianceCache->SetAccumulationFactor(accumFactor);
+
         ImGui::Checkbox("Allow skip IC", &allowSkipIC);
 
         ImGui::End();

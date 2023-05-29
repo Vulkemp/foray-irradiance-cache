@@ -24,7 +24,8 @@ struct IrradianceCacheConfig {
 	vec4 imageExtent;
 // x IrradianceCacheMode
 // y bool clearCache
-// zw unused
+// z indirect: traces per frame
+// w indirect: accumulation factor
 	uvec4 config;
 };
 
@@ -44,6 +45,14 @@ uint irradianceCacheMode() {
 
 bool irradianceCacheClearCache() {
 	return TracerConfig.irrConfig.config.y != 0;
+}
+
+uint irradianceCacheIndirectTracesPerFrame() {
+	return TracerConfig.irrConfig.config.z;
+}
+
+float irradianceCacheIndirectAccumulationFactor() {
+	return uintBitsToFloat(TracerConfig.irrConfig.config.w);
 }
 
 

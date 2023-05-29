@@ -34,6 +34,10 @@ namespace foray::irradiance_cache {
         return VkExtent3D{probes.x, probes.y, probes.z};
     }
 
+    float IrradianceCache::optimalAccumulationRateForTraces(uint32_t tracesPerFrame) {
+        return (float) tracesPerFrame / 64.f / 100.f;
+    }
+
     void IrradianceCache::frameFinished() {
         // frame is done, stop clearing cache
         // requires a queue so clearing cache from ImGui doesn't get cleared immediately
@@ -50,11 +54,17 @@ namespace foray::irradiance_cache {
 
     void IrradianceCacheShaderAccess::pushConstants(VkCommandBuffer cmdBuffer, base::FrameRenderInfo &renderInfo) {
         auto imageExtent = irradianceCache.GetImageExtent();
+        float ONE = 1;
         PushConstant ps = {
                 glm::vec4(irradianceCache.mOrigin, 0.f),
                 glm::vec4(irradianceCache.mExtent, 0.f),
                 glm::vec4(imageExtent.width, imageExtent.height, imageExtent.depth, 0.f),
-                glm::uvec4((uint32_t) irradianceCache.mMode, irradianceCache.mClearCache ? 1 : 0, 0, 0),
+                glm::uvec4(
+                        (uint32_t) irradianceCache.mMode,
+                        irradianceCache.mClearCache ? 1 : 0,
+                        irradianceCache.mTracesPerFrame,
+                        *reinterpret_cast<uint32_t*>(irradianceCache.mClearCache ? &ONE : &irradianceCache.mAccumulationFactor)
+                ),
                 (uint32_t) renderInfo.GetFrameNumber()
         };
         vkCmdPushConstants(cmdBuffer, pipelineLayout, stageFlags, 0, sizeof(ps), &ps);

@@ -18,7 +18,8 @@ namespace foray::irradiance_cache {
         glm::vec4 imageExtent;
         // x IrradianceCacheMode
         // y bool clearCache
-        // zw unused
+        // z indirect: traces per frame
+        // w indirect: accumulation factor
         glm::uvec4 config;
         uint32_t RngSeed;
     };
@@ -33,6 +34,8 @@ namespace foray::irradiance_cache {
         // @brief select an imageExtent so that probes are PROBE_DISTANCE always apart, may increase extent to match PROBE_DISTANCE
         static VkExtent3D calculateImageExtend(glm::vec3 &extent, glm::vec3 probeDistance);
 
+        static float optimalAccumulationRateForTraces(uint32_t tracesPerFrame);
+
         void frameFinished();
 
         FORAY_GETTER_V(Origin);
@@ -46,6 +49,10 @@ namespace foray::irradiance_cache {
         FORAY_GETTER_R(IndirectImage);
 
         FORAY_GETTER_R(TempImage);
+
+        FORAY_PROPERTY_R(TracesPerFrame);
+
+        FORAY_PROPERTY_R(AccumulationFactor);
 
         inline VkExtent3D GetImageExtent() {
             return mIndirectImage.GetExtent3D();
@@ -69,6 +76,8 @@ namespace foray::irradiance_cache {
         IrradianceCacheMode mMode = IrradianceCacheMode::DEFAULT;
         bool mClearCacheQueued = false;
         bool mClearCache = true;
+        uint32_t mTracesPerFrame = 32;
+        float mAccumulationFactor = 0.995f;
 
         foray::core::Managed3dImage mIndirectImage;
         foray::core::Managed3dImage mTempImage;

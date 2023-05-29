@@ -132,7 +132,7 @@ namespace foray::irradiance_cache {
 
         float optimalAccumFactor = IrradianceCache::optimalAccumulationRateForTraces(tracesPerFrame);
         ImGui::SliderFloat("Accumulation Quality", &accumQuality, 1.f / 64.f, 4, "%.4f", ImGuiSliderFlags_Logarithmic);
-        float accumFactor = optimalAccumFactor / accumQuality;
+        float accumFactor = std::clamp(optimalAccumFactor / accumQuality, 0.f, 1.f);
         ImGui::SliderFloat("Accumulation Factor", &accumFactor, 0, 0.5, "%.4f");
         accumQuality = optimalAccumFactor / accumFactor;
         mIrradianceCache->SetAccumulationFactor(accumFactor);

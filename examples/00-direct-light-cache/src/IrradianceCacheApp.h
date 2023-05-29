@@ -5,6 +5,7 @@
 #include "IrradianceCacheDirectStage.h"
 #include "IrrradianceCacheMode.h"
 #include "IrradianceCacheIndirectStage.h"
+#include "IrradianceCacheGui.h"
 
 namespace foray::irradiance_cache {
 
@@ -20,13 +21,18 @@ namespace foray::irradiance_cache {
 
         void ApiDestroy() override;
 
-        void ImGui();
+    public:
+        FORAY_GETTER_MR(Scene);
+
+        FORAY_GETTER_MR(IrradianceCache);
+
+        FORAY_PROPERTY_R(AllowSkipIC);
 
     private:
         std::unique_ptr<foray::scene::Scene> mScene;
         std::optional<IrradianceCache> mIrradianceCache;
-        bool allowSkipIC = true;
-        float accumQuality = 1;
+        std::optional<IrradianceCacheGui> mGui;
+        bool mAllowSkipIC = true;
 
         // stages
         std::optional<FinalRTStage> mRtStage;

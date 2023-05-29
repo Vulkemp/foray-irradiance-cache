@@ -1,6 +1,5 @@
 #include "IrradianceCacheApp.h"
 #include "scene/globalcomponents/foray_aabbmanager.hpp"
-#include <imgui/imgui.h>
 
 namespace foray::irradiance_cache {
 
@@ -45,8 +44,9 @@ namespace foray::irradiance_cache {
         mSwapCopyStage.SetFlipY(INVERT_BLIT_INSTEAD);
         RegisterRenderStage(&mSwapCopyStage);
 
+        mGui.emplace(*this);
         mImguiStage.InitForSwapchain(&mContext);
-        mImguiStage.AddWindowDraw([this]() { this->ImGui(); });
+        mImguiStage.AddWindowDraw([this]() { mGui->ImGui(); });
         RegisterRenderStage(&mImguiStage);
 
         DefaultAppBase::ApiInit();
@@ -92,7 +92,7 @@ namespace foray::irradiance_cache {
         renderInfo.GetInFlightFrame()->ClearSwapchainImage(cmdBuffer, renderInfo.GetImageLayoutCache());
         mScene->Update(renderInfo, cmdBuffer);
 
-        if (!(allowSkipIC && skipIC(mIrradianceCache->GetMode()))) {
+        if (!(mAllowSkipIC && skipIC(mIrradianceCache->GetMode()))) {
             mIrradianceCacheDirectStage->RecordFrame(cmdBuffer, renderInfo);
             mIrradianceCacheIndirectStage->RecordFrame(cmdBuffer, renderInfo);
         }
@@ -103,43 +103,6 @@ namespace foray::irradiance_cache {
         renderInfo.GetInFlightFrame()->PrepareSwapchainImageForPresent(cmdBuffer, renderInfo.GetImageLayoutCache());
         cmdBuffer.Submit();
         mIrradianceCache->frameFinished();
-    }
-
-    void IrradianceCacheApp::ImGui() {
-        ImGui::Begin("window");
-        foray::base::RenderLoop::FrameTimeAnalysis analysis = mRenderLoop.AnalyseFrameTimes();
-        ImGui::Text("FPS: %f avg %f min", analysis.Count > 0 ? 1.f / analysis.AvgFrameTime : 0, analysis.Count > 0 ? 1.f / analysis.MaxFrameTime : 0);
-
-        std::string modeName(NAMEOF_ENUM(mIrradianceCache->GetMode()));
-        if (ImGui::BeginCombo("Mode", modeName.c_str())) {
-            for (uint32_t i = 0; i < (uint32_t) IrradianceCacheMode::MAX_ENUM; i++) {
-                auto mode = (IrradianceCacheMode) i;
-                modeName = std::string(NAMEOF_ENUM(mode));
-                if (ImGui::MenuItem(modeName.c_str())) {
-                    mIrradianceCache->SetMode(mode);
-                }
-            }
-            ImGui::EndCombo();
-        }
-
-        if (ImGui::Button("Clear Irradiance Cache")) {
-            mIrradianceCache->clearCache();
-        }
-
-        int tracesPerFrame = (int) mIrradianceCache->GetTracesPerFrame();
-        ImGui::SliderInt("Traces per frame", &tracesPerFrame, 1, 256, "%u", ImGuiSliderFlags_Logarithmic);
-        mIrradianceCache->SetTracesPerFrame(tracesPerFrame > 1 ? (uint32_t) tracesPerFrame : 1);
-
-        float optimalAccumFactor = IrradianceCache::optimalAccumulationRateForTraces(tracesPerFrame);
-        ImGui::SliderFloat("Accumulation Quality", &accumQuality, 1.f / 64.f, 4, "%.4f", ImGuiSliderFlags_Logarithmic);
-        float accumFactor = std::clamp(optimalAccumFactor / accumQuality, 0.f, 1.f);
-        ImGui::SliderFloat("Accumulation Factor", &accumFactor, 0, 0.5, "%.4f");
-        accumQuality = optimalAccumFactor / accumFactor;
-        mIrradianceCache->SetAccumulationFactor(accumFactor);
-
-        ImGui::Checkbox("Allow skip IC", &allowSkipIC);
-
-        ImGui::End();
     }
 
     void IrradianceCacheApp::ApiDestroy() {

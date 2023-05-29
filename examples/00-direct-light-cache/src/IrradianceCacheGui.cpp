@@ -1,5 +1,8 @@
 #include "IrradianceCacheGui.h"
 #include "IrradianceCacheApp.h"
+#include "scene/globalcomponents/foray_cameramanager.hpp"
+#include "scene/components/foray_camera.hpp"
+#include "scene/components/foray_transform.hpp"
 #include <imgui/imgui.h>
 
 namespace foray::irradiance_cache {
@@ -9,8 +12,12 @@ namespace foray::irradiance_cache {
 
     void IrradianceCacheGui::ImGui() {
         ImGui::Begin("window");
+
         foray::base::RenderLoop::FrameTimeAnalysis analysis = mApp.GetRenderLoop().AnalyseFrameTimes();
         ImGui::Text("FPS: %f avg %f min", analysis.Count > 0 ? 1.f / analysis.AvgFrameTime : 0, analysis.Count > 0 ? 1.f / analysis.MaxFrameTime : 0);
+
+        glm::vec3 cameraPos = mApp.GetScene()->GetComponent<foray::scene::gcomp::CameraManager>()->GetSelectedCamera()->GetNode()->GetTransform()->GetTranslation();
+        ImGui::Text("Camera: %f %f %f", cameraPos.x, cameraPos.y, cameraPos.z);
 
         auto &irradianceCache = *mApp.GetIrradianceCache();
         std::string modeName(NAMEOF_ENUM(irradianceCache.GetMode()));

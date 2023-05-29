@@ -16,10 +16,10 @@ vec4 readIrradianceCache(uvec3 pixelSpace) {
 }
 
 vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
-	const float normalOffsetFactor = 0.3;
+	const float normalOffsetFactor = irradianceCacheNormalOffsetFactor();
 	vec3 normalOffset = normal * normalOffsetFactor;
 
-	vec3 voxelGlobal = transformWorldToIrradiancePixel(worldSpace + normalOffset);
+	vec3 voxelGlobal = transformWorldToIrradiancePixel(worldSpace) + normalOffset;
 	uvec3 voxel = uvec3(voxelGlobal);
 	vec3 voxelFrac = fract(voxelGlobal);
 

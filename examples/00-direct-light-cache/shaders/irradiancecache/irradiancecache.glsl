@@ -16,7 +16,7 @@ const uint MODE_DIRECT_IC = 4;
 const uint MODE_DEBUG_PATTERN = 5;
 
 struct IrradianceCacheConfig {
-// w unused
+// w NormalOffsetFactor
 	vec4 origin;
 // w unused
 	vec4 extent;
@@ -53,6 +53,10 @@ uint irradianceCacheIndirectTracesPerFrame() {
 
 float irradianceCacheIndirectAccumulationFactor() {
 	return uintBitsToFloat(TracerConfig.irrConfig.config.w);
+}
+
+float irradianceCacheNormalOffsetFactor() {
+	return TracerConfig.irrConfig.origin.w;
 }
 
 

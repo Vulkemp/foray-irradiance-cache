@@ -56,7 +56,7 @@ namespace foray::irradiance_cache {
         auto imageExtent = irradianceCache.GetImageExtent();
         float ONE = 1;
         PushConstant ps = {
-                glm::vec4(irradianceCache.mOrigin, 0.f),
+                glm::vec4(irradianceCache.mOrigin, irradianceCache.mNormalOffsetFactor),
                 glm::vec4(irradianceCache.mExtent, 0.f),
                 glm::vec4(imageExtent.width, imageExtent.height, imageExtent.depth, 0.f),
                 glm::uvec4(

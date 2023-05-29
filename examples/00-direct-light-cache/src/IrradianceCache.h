@@ -10,7 +10,7 @@
 namespace foray::irradiance_cache {
 
     struct PushConstant {
-        // w = IrradianceCacheMode
+        // w NormalOffsetFactor
         glm::vec4 origin;
         // w unused
         glm::vec4 extent;
@@ -54,6 +54,8 @@ namespace foray::irradiance_cache {
 
         FORAY_PROPERTY_R(AccumulationFactor);
 
+        FORAY_PROPERTY_R(NormalOffsetFactor);
+
         inline VkExtent3D GetImageExtent() {
             return mIndirectImage.GetExtent3D();
         }
@@ -78,6 +80,7 @@ namespace foray::irradiance_cache {
         bool mClearCache = true;
         uint32_t mTracesPerFrame = 32;
         float mAccumulationFactor = 0.995f;
+        float mNormalOffsetFactor = 1.f;
 
         foray::core::Managed3dImage mIndirectImage;
         foray::core::Managed3dImage mTempImage;

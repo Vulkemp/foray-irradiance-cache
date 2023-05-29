@@ -47,6 +47,8 @@ namespace foray::irradiance_cache {
         accumQuality = optimalAccumFactor / accumFactor;
         irradianceCache.SetAccumulationFactor(accumFactor);
 
+        ImGui::SliderFloat("Normal Offset Factor", &irradianceCache.GetNormalOffsetFactor(), 0, 4, "%.2f");
+
         ImGui::Checkbox("Allow skip IC", &mApp.GetAllowSkipIC());
 
         ImGui::End();

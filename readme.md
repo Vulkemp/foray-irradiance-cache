@@ -1,4 +1,7 @@
 # Foray Irradiance Cache
+
+![Irradance Cache Example](docs/irradiancecache.jpg)
+
 An Irradiance cache implemented by [@Firestar99](https://github.com/Firestar99) based upon the foray framework.
 
 ## Setup
@@ -6,15 +9,9 @@ An Irradiance cache implemented by [@Firestar99](https://github.com/Firestar99) 
 ```
 git clone --recursive https://github.com/Vulkemp/foray-examples
 ```
-Also clones the submodule `foray` (required).
-
-## Examples
-### [Direct Light Cache](./examples/00-direct-light-cache)
-First simple experiment with an irradiance cache by using it for direct light. You would of course not use such a cache for direct light as it wouldn't look great, 
-but it's a first step towards getting an indirect light cache working.
+Also clones the required submodule `foray`.
 
 ## Tested Build Environments
-* Linux G++
-* Linux Clang
-* Windows MSVC
-* Windows Clang
+* Linux RADV
+* Windows Nvidia
+* sadly AMDVLK / AMD on Windows does not work atm, segfaults inside the driver during raytrace pipeline initialization

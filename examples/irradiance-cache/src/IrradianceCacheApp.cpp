@@ -6,6 +6,9 @@ namespace foray::irradiance_cache {
     const std::string SCENE_FILE = DATA_DIR "/gltf/CornellBoxPointLight/CornellBoxPointLight.gltf";
     const glm::vec3 PROBE_DISTANCE(0.05);
 
+//    const std::string SCENE_FILE = DATA_DIR "/gltf/CornellBox/CornellBox.gltf";
+//    const glm::vec3 PROBE_DISTANCE(0.05);
+
 //    const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/scene.gltf";
 //    const glm::vec3 PROBE_DISTANCE(0.2);
 

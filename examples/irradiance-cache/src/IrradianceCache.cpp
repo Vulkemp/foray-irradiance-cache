@@ -17,7 +17,7 @@ namespace foray::irradiance_cache {
             mExtent(extent) {
         assert(isPositive(extent));
         VkImageUsageFlags usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
-        mIndirectImage.Create(context, usage, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, imageExtend, "Irradiance Cache Indirect");
+        mAccumImage.Create(context, usage, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, imageExtend, "Irradiance Cache Indirect");
         mTempImage.Create(context, usage, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, imageExtend, "Irradiance Cache Temp");
     }
 

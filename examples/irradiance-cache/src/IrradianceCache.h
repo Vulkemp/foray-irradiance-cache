@@ -46,7 +46,7 @@ namespace foray::irradiance_cache {
 
         FORAY_GETTER_V(Mode);
 
-        FORAY_GETTER_R(IndirectImage);
+        FORAY_GETTER_R(AccumImage);
 
         FORAY_GETTER_R(TempImage);
 
@@ -57,7 +57,7 @@ namespace foray::irradiance_cache {
         FORAY_PROPERTY_R(NormalOffsetFactor);
 
         inline VkExtent3D GetImageExtent() {
-            return mIndirectImage.GetExtent3D();
+            return mAccumImage.GetExtent3D();
         }
 
         inline void SetMode(IrradianceCacheMode mode) {
@@ -82,7 +82,7 @@ namespace foray::irradiance_cache {
         float mAccumulationFactor = 0.995f;
         float mNormalOffsetFactor = 1.f;
 
-        foray::core::Managed3dImage mIndirectImage;
+        foray::core::Managed3dImage mAccumImage;
         foray::core::Managed3dImage mTempImage;
     };
 

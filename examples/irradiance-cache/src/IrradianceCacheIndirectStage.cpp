@@ -60,7 +60,7 @@ namespace foray::irradiance_cache {
                                        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, foray::stages::RTSTAGEFLAGS);
         mDescriptorSet.SetDescriptorAt(BIND_IN_IRRADIANCE_CACHE, mIrradianceCache.GetTempImage(), VK_IMAGE_LAYOUT_GENERAL,
                                        nullptr, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, stages::RTSTAGEFLAGS);
-        mDescriptorSet.SetDescriptorAt(BIND_OUT_IMAGE, mIrradianceCache.GetIndirectImage(), VK_IMAGE_LAYOUT_GENERAL,
+        mDescriptorSet.SetDescriptorAt(BIND_OUT_IMAGE, mIrradianceCache.GetAccumImage(), VK_IMAGE_LAYOUT_GENERAL,
                                        nullptr, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, stages::RTSTAGEFLAGS);
         RaytracingStageBase::CreateOrUpdateDescriptors();
     }
@@ -82,7 +82,7 @@ namespace foray::irradiance_cache {
                 .DstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT,
                 .NewLayout     = VkImageLayout::VK_IMAGE_LAYOUT_GENERAL
         }));
-        imageFullBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetIndirectImage(), core::ImageLayoutCache::Barrier2{
+        imageFullBarriers.push_back(renderInfo.GetImageLayoutCache().MakeBarrier(mIrradianceCache.GetAccumImage(), core::ImageLayoutCache::Barrier2{
                 .SrcStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,
                 .SrcAccessMask = VK_ACCESS_2_MEMORY_READ_BIT,
                 .DstStageMask  = VK_PIPELINE_STAGE_2_RAY_TRACING_SHADER_BIT_KHR,

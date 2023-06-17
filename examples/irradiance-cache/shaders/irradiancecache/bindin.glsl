@@ -55,11 +55,13 @@ vec4 sampleIrradianceCache(vec3 worldSpace, vec3 normal) {
 		}
 	}
 
-	// ignore dark texels
-	for (uint i = 0; i < 8; i++) {
-		const float compeltelyDarkTexelsLimit = 0.015;
-		if ((abs(probe[i].x) + abs(probe[i].y) + abs(probe[i].z)) < compeltelyDarkTexelsLimit) {
-			probeWeight[i] = 0;
+	// ignore dark texels, disabled in direct_ic mode
+	if (irradianceCacheMode() != MODE_DIRECT_IC) {
+		for (uint i = 0; i < 8; i++) {
+			const float compeltelyDarkTexelsLimit = 0.015;
+			if ((abs(probe[i].x) + abs(probe[i].y) + abs(probe[i].z)) < compeltelyDarkTexelsLimit) {
+				probeWeight[i] = 0;
+			}
 		}
 	}
 

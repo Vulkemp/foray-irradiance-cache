@@ -39,7 +39,7 @@ vec3 CollectLight(vec3 pos, vec3 normal, MaterialBufferObject material, Material
 		hit.wOut = -gl_WorldRayDirectionEXT;
 		hit.wIn = dir;
 		hit.wHalf = normalize(hit.wOut + hit.wIn);
-		reflection += sampleIrradianceCache(pos, normal).xyz * EvaluateMaterial(hit, material, probe) * attenuation;
+		reflection += sampleIrradianceCache(pos, normal).xyz * EvaluateMaterialOnlyDiffuse(hit, material, probe) * attenuation;
 	}
 
 	vec3 wOut = normalize(-gl_WorldRayDirectionEXT);

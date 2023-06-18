@@ -21,8 +21,9 @@ void main()
 	vec4 origin = Camera.InverseViewMatrix * vec4(0, 0, 0, 1);// Ray origin in world space
 	vec4 direction = Camera.InverseViewMatrix * Camera.InverseProjectionMatrix * vec4(d.x, d.y, 1, 1);// Target direction in world space
 
-
 	ProbeMatTraceConfig probeMatConfig;
+	probeMatConfig.traceIndirectLightDepth = 0;
+	probeMatConfig.perfectlyReflectiveDepth = 1;
 	uint mode = irradianceCacheMode();
 	if (mode == MODE_INDIRECT_TRACE_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = false;
@@ -31,20 +32,16 @@ void main()
 	} else if (mode == MODE_INDIRECT_IC_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = true;
-		probeMatConfig.traceIndirectLightDepth = 0;
 	} else if (mode == MODE_INDIRECT_IC || mode == MODE_DIRECT_IC || mode == MODE_DEBUG_PATTERN) {
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = false;
-		probeMatConfig.traceIndirectLightDepth = 0;
 	} else if (mode == MODE_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = false;
 		probeMatConfig.traceDirectLight = true;
-		probeMatConfig.traceIndirectLightDepth = 0;
 	} else {
 		// not implemented! -> specific recognizable color
 		probeMatConfig.sampleIrradianceCache = true;
 		probeMatConfig.traceDirectLight = false;
-		probeMatConfig.traceIndirectLightDepth = 0;
 	}
 
 	uint seed = CalculateSeedXTEA(ivec2(gl_LaunchIDEXT.xy), TracerConfig.RngSeed);

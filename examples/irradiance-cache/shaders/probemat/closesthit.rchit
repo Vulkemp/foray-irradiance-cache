@@ -49,6 +49,9 @@ vec3 CollectLight(vec3 pos, vec3 normal, MaterialBufferObject material, Material
 	if (ProbeMatInPayload.config.traceIndirectLightDepth > 0) {
 		reflection += collectIndirectLightAndMaterial(pos, normal, wOut, material, probe, attenuation, ProbeMatInPayload.hit.Seed, ProbeMatInPayload.config);
 	}
+	if (ProbeMatInPayload.config.perfectlyReflectiveDepth > 0) {
+		reflection += collectPerfectlyReflective(pos, normal, wOut, material, probe, attenuation, ProbeMatInPayload.hit.Seed, ProbeMatInPayload.config);
+	}
 	return reflection;
 }
 

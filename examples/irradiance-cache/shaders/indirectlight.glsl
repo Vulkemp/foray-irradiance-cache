@@ -12,7 +12,7 @@ void CorrectOrigin(inout vec3 origin, vec3 normal, float nDotL)
 	origin += normal * correctorLength;
 }
 
-vec3 collectIndirectLightAndMaterial(vec3 pos, vec3 normal, vec3 wOut, MaterialBufferObject material, MaterialProbe probe, vec3 attenuation, inout uint seed, ProbeMatTraceConfig config)
+vec3 collectIndirectLightAndMaterial(vec3 origin, vec3 normal, vec3 wOut, MaterialBufferObject material, MaterialProbe probe, vec3 attenuation, inout uint seed, ProbeMatTraceConfig config)
 {
 	vec3 sumIndirect = vec3(0);
 	int weightIndirect = 0;
@@ -33,8 +33,6 @@ vec3 collectIndirectLightAndMaterial(vec3 pos, vec3 normal, vec3 wOut, MaterialB
 	for (uint i = 0; i < secondary; i++)
 	{
 		seed += 1;
-		float alpha = probe.MetallicRoughness.g * probe.MetallicRoughness.g;
-		vec3 origin = pos;
 
 		HitSample hit;
 		hit.wOut = wOut;
@@ -53,11 +51,45 @@ vec3 collectIndirectLightAndMaterial(vec3 pos, vec3 normal, vec3 wOut, MaterialB
 			ProbeMatTraceConfig newConfig;
 			newConfig.sampleIrradianceCache = config.sampleIrradianceCache;
 			newConfig.traceDirectLight = config.traceDirectLight;
-			newConfig.traceIndirectLightDepth = config.traceIndirectLightDepth - 1;
+			newConfig.traceIndirectLightDepth = config.traceIndirectLightDepth > 0 ? config.traceIndirectLightDepth - 1 : 0;
+			newConfig.perfectlyReflectiveDepth = config.perfectlyReflectiveDepth > 0 ? config.perfectlyReflectiveDepth - 1 : 0;
 
 			sumIndirect += performProbeMat(origin, 0.001, hit.wIn, INFINITY, newConfig, seed + i, newAttenuation);
 			weightIndirect += 1;
 		}
 	}
 	return weightIndirect > 0 ? sumIndirect / weightIndirect : vec3(0);
+}
+
+vec3 collectPerfectlyReflective(vec3 origin, vec3 normal, vec3 wOut, MaterialBufferObject material, MaterialProbe probe, vec3 attenuation, inout uint seed, ProbeMatTraceConfig config)
+{
+	// this is the original statement, but the one below works better on the salle_de_bain scene
+	//	bool perfectlyReflective = probe.MetallicRoughness.r > 0.99 && probe.MetallicRoughness.g < 0.01;
+	bool perfectlyReflective = probe.MetallicRoughness.g < 0.05;
+	if (perfectlyReflective)
+	{
+		HitSample hit;
+		hit.wOut = wOut;
+		hit.Normal = normal;
+		hit.wIn = normalize(-reflect(hit.wOut, hit.Normal));
+		hit.wHalf = normalize(hit.wOut + hit.wIn);
+
+		float ndotl = dot(hit.wIn, hit.Normal);
+		float ndotv = dot(hit.wOut, hit.Normal);
+		CorrectOrigin(origin, normal, ndotl);
+
+		// If expected contribution is high enough ...
+		vec3 newAttenuation = EvaluateMaterial(hit, material, probe);
+		if (dot(newAttenuation, newAttenuation) > 0.001)
+		{
+			ProbeMatTraceConfig newConfig;
+			newConfig.sampleIrradianceCache = config.sampleIrradianceCache;
+			newConfig.traceDirectLight = config.traceDirectLight;
+			newConfig.traceIndirectLightDepth = config.traceIndirectLightDepth > 0 ? config.traceIndirectLightDepth - 1 : 0;
+			newConfig.perfectlyReflectiveDepth = config.perfectlyReflectiveDepth > 0 ? config.perfectlyReflectiveDepth - 1 : 0;
+
+			return performProbeMat(origin, 0.001, hit.wIn, INFINITY, newConfig, seed, newAttenuation);
+		}
+	}
+	return vec3(0);
 }

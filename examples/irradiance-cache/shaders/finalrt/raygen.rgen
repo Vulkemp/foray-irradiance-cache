@@ -23,7 +23,7 @@ void main()
 
 	ProbeMatTraceConfig probeMatConfig;
 	probeMatConfig.traceIndirectLightDepth = 0;
-	probeMatConfig.perfectlyReflectiveDepth = 1;
+	probeMatConfig.perfectlyReflectiveDepth = 2;
 	uint mode = irradianceCacheMode();
 	if (mode == MODE_INDIRECT_TRACE_DIRECT_TRACE) {
 		probeMatConfig.sampleIrradianceCache = false;

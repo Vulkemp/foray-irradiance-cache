@@ -10,7 +10,7 @@
 #include "shading/material.glsl"
 
 // Do a maximum of 5 light tests (since each is a ray cast, which is quite expensive)
-const uint DIRECT_LIGHT_TEST_CNT = 5;
+const uint DIRECT_LIGHT_TEST_CNT = 3;
 
 vec3 collectDirectLightBase(vec3 pos, bool useMaterial, vec3 normal, vec3 wOut, MaterialBufferObject material, MaterialProbe probe, inout uint seed)
 {
@@ -19,10 +19,34 @@ vec3 collectDirectLightBase(vec3 pos, bool useMaterial, vec3 normal, vec3 wOut, 
 	vec3 directLightSum = vec3(0);
 	int directLightWeight = 0;
 
+	uint lightsTested[DIRECT_LIGHT_TEST_CNT];
+
 	for (uint i = 0; i < lightTestCount; i++)
 	{
 		// Randomly select a light source
-		SimplifiedLight light = SimplifiedLights.Array[lcgUint(seed) % SimplifiedLights.Count];
+		SimplifiedLight light;
+		{
+			float minLength = 1/0;
+			uint minIndex = 0;
+			SimplifiedLight minLight;
+			for (uint k = 0; k < SimplifiedLights.Count; k++) {
+				bool alreadyTested = false;
+				for (uint o = 0; o < i; o++) {
+					alreadyTested = alreadyTested || lightsTested[o] == k;
+				}
+				if (!alreadyTested) {
+					light = SimplifiedLights.Array[k];
+					float length = (light.Type == SimplifiedLightType_Directional) ? 0 : length(light.PosOrDir - pos);
+					if (length < minLength) {
+						minLength = length;
+						minIndex = k;
+						minLight = light;
+					}
+				}
+			}
+			light = minLight;
+			lightsTested[i] = minIndex;
+		}
 
 		// light properties
 		vec3 origin = pos;

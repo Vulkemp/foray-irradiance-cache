@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v3.5.30",
+		"generator":"Khronos glTF Blender I/O v3.6.27",
 		"version":"2.0"
 	},
 	"extensionsUsed":[
@@ -45,7 +45,7 @@
 			"translation":[
 				0,
 				1,
-				2.5
+				4.699999809265137
 			]
 		},
 		{
@@ -83,7 +83,7 @@
 			"name":"Camera",
 			"perspective":{
 				"aspectRatio":1,
-				"yfov":1.3089969158172607,
+				"yfov":0.523598849773407,
 				"zfar":100,
 				"znear":0.10000000149011612
 			},

@@ -1,5 +1,7 @@
 #include "IrradianceCacheApp.h"
 #include "scene/globalcomponents/foray_aabbmanager.hpp"
+#include "scene/globalcomponents/foray_cameramanager.hpp"
+#include "scene/components/foray_camera.hpp"
 
 namespace foray::irradiance_cache {
 
@@ -18,14 +20,25 @@ namespace foray::irradiance_cache {
     /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
     constexpr bool INVERT_BLIT_INSTEAD = true;
 
+    constexpr bool USE_CAMERA_FROM_GLTF = false;
+
     void IrradianceCacheApp::ApiInit() {
         mScene = std::make_unique<scene::Scene>(&mContext);
         gltf::ModelConverter converter(mScene.get());
         gltf::ModelConverterOptions options{.FlipY = !INVERT_BLIT_INSTEAD};
         converter.LoadGltfModel(SCENE_FILE, nullptr, options);
 
+        if (USE_CAMERA_FROM_GLTF) {
+            mScene->GetComponent<scene::gcomp::CameraManager>()->RefreshCameraList();
+            foray::scene::ncomp::Camera *camera = mScene->GetComponent<foray::scene::gcomp::CameraManager>()->GetSelectedCamera();
+            // vfov is not correctly loaded, needs to be adjusted here
+            camera->SetVerticalFov(glm::radians(30.f));
+            camera->SetProjectionMatrix();
+        } else {
+            mScene->UseDefaultCamera(INVERT_BLIT_INSTEAD);
+        }
+
         mScene->UpdateTlasManager();
-        mScene->UseDefaultCamera(INVERT_BLIT_INSTEAD);
         mScene->UpdateLightManager();
 
         auto *aabbManager = mScene->MakeComponent<foray::scene::gcomp::AabbManager>();

@@ -17,7 +17,7 @@ namespace foray::irradiance_cache {
 //    const std::string SCENE_FILE = DATA_DIR "/gltf/testbox/scene.gltf";
 //    const glm::vec3 PROBE_DISTANCE(0.2);
 
-    /// @brief If true, will invert the viewport when blitting. Will invert the scene while loading to -Y up if false
+    /// @brief If true, will invert the viewport when blitting. If false, will invert the scene while loading to -Y up.
     constexpr bool INVERT_BLIT_INSTEAD = true;
 
     constexpr bool USE_CAMERA_FROM_GLTF = false;
